@@ -1,0 +1,12 @@
+{
+  "Layers": [
+    {
+      "Files": [
+        "Sounds/Custom/Book_Orbis_Sigil_Close_Stereo_01.ogg"
+      ]
+    }
+  ],
+  "PreventSoundInterruption": false,
+  "MaxInstance": 1,
+  "Volume": 2.0
+}

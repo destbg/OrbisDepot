@@ -1,0 +1,33 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  Group {
+    Anchor: (Height: 8);
+  }
+
+  Group {
+    Padding: (Left: 12, Right: 12);
+    LayoutMode: Top;
+
+    $C.@CheckBoxWithLabel #AutoPlaceToggle {
+      @Text = "Auto-place from Depot";
+      @Checked = true;
+    }
+
+    Group {
+      Anchor: (Height: 6);
+    }
+
+    $C.@CheckBoxWithLabel #CraftingToggle {
+      @Text = "Crafting integration";
+      @Checked = true;
+    }
+  }
+
+  Group {
+    FlexWeight: 1;
+  }
+}

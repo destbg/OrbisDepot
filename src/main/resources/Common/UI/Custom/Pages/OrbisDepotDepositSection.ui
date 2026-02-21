@@ -1,0 +1,58 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  $C.@PanelTitle {
+    @Text = "INPUT";
+  }
+
+  Group {
+    FlexWeight: 1;
+  }
+
+  Group {
+    LayoutMode: Center;
+
+    Group {
+      LayoutMode: Top;
+      Anchor: (Width: 160);
+
+      Group #DepositSlots {
+        LayoutMode: LeftCenterWrap;
+      }
+
+      Group {
+        Anchor: (Height: 8);
+      }
+
+      Group {
+        Anchor: (Height: 12);
+        Background: "../Common/ProgressBar.png";
+        Padding: 0;
+
+        ProgressBar #UploadProgressBar {
+          BarTexturePath: "../Common/ProgressBarFill.png";
+          EffectTexturePath: "../Common/ProgressBarEffect.png";
+          EffectWidth: 102;
+          EffectHeight: 58;
+          EffectOffset: 74;
+        }
+      }
+
+      Group {
+        Anchor: (Height: 6);
+      }
+
+      Label #DepositStatusLabel {
+        Style: (FontSize: 11, TextColor: #96a9be, HorizontalAlignment: Center, VerticalAlignment: Center, Wrap: true);
+        Text: "Place items";
+      }
+    }
+  }
+
+  Group {
+    FlexWeight: 1;
+  }
+}

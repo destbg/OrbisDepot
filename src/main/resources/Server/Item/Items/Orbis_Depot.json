@@ -1,0 +1,140 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Orbis_Depot.name",
+    "Description": "server.items.Orbis_Depot.description"
+  },
+  "PlayerAnimationsId": "Block",
+  "Categories": [
+    "Items.Orbis_Depot"
+  ],
+  "Icon": "Icons/ItemsGenerated/Orbis_Depot.png",
+  "IconProperties": {
+    "Scale": 0.58823,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Translation": [
+      0,
+      -13.5
+    ]
+  },
+  "BlockType": {
+    "BlockParticleSetId": "Metal",
+    "BlockSoundSetId": "Metal",
+    "CustomModel": "Blocks/Dungeons/Chest_Epic_Small.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Custom/Chest_Orbis_Depot.png",
+        "Weight": 1
+      }
+    ],
+    "DrawType": "Model",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "VolcanicRocks"
+      }
+    },
+    "HitboxType": "Chest_Small",
+    "Material": "Solid",
+    "Opacity": "Transparent",
+    "ParticleColor": "#373431",
+    "State": {
+      "Id": "OrbisDepot",
+      "Capacity": 1,
+      "Definitions": {
+        "OpenWindow": {
+          "Particles": [
+            {
+              "SystemId": "Magic_Hit",
+              "TargetNodeName": "Button",
+              "Scale": 1,
+              "PositionOffset": {}
+            }
+          ],
+          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim",
+          "State": {
+            "Definitions": {
+              "CloseWindow": {
+                "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Close.blockyanim"
+              },
+              "OpenWindow": {
+                "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Supporting": {
+      "Up": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "VariantRotation": "NESW",
+    "Interactions": {
+      "Primary": "Break_Container",
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "Orbis_Depot_Open"
+          }
+        ],
+        "Settings": {
+          "Adventure": {},
+          "Creative": {}
+        }
+      }
+    }
+  },
+  "Scale": 0.6,
+  "Variant": true,
+  "ItemSoundSetId": "ISS_Items_Metal",
+  "MaxStack": 10,
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Workbench",
+        "Categories": [
+          "Workbench_Tinkering"
+        ]
+      }
+    ],
+    "TimeSeconds": 5,
+    "Input": [
+      {
+        "ItemId": "Ingredient_Voidheart",
+        "Quantity": 1
+      },
+      {
+        "ItemId": "Ingredient_Bar_Gold",
+        "Quantity": 5
+      },
+      {
+        "ItemId": "Ingredient_Bar_Silver",
+        "Quantity": 5
+      },
+      {
+        "ItemId": "Plant_Crop_Mana3",
+        "Quantity": 1
+      }
+    ],
+    "OutputQuantity": 1
+  },
+  "Quality": "Epic",
+  "ItemLevel": 40
+}

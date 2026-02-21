@@ -1,0 +1,20 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  $C.@PanelTitle {
+    @Text = "STORAGE";
+  }
+
+  Group #StorageSection {
+    FlexWeight: 1;
+    LayoutMode: TopScrolling;
+    ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+    Group #StorageCards {
+      LayoutMode: LeftCenterWrap;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+$C = "../Common.ui";
+
+$C.@Container {
+  Anchor: (Width: 720, Height: 448);
+
+  #Title {
+    Group {
+      $C.@Title #InventoryTitle {
+        @Text = "INVENTORY";
+        @Alignment = Start;
+      }
+    }
+  }
+
+  #Content {
+    LayoutMode: Top;
+
+    Group #PlayerInventoryCards {
+      LayoutMode: Top;
+    }
+  }
+}

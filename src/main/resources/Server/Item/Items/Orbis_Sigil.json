@@ -1,0 +1,83 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Orbis_Sigil.name",
+    "Description": "server.items.Orbis_Sigil.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Orbis_Sigil.png",
+  "Interactions": {
+    "Primary": "Block_Primary",
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "Orbis_Sigil_Open"
+        }
+      ],
+      "Settings": {
+        "Adventure": {},
+        "Creative": {}
+      }
+    }
+  },
+  "PlayerAnimationsId": "Item",
+  "Categories": [
+    "Items.Orbis_Depot"
+  ],
+  "BlockType": {
+    "BlockParticleSetId": "Metal",
+    "BlockSoundSetId": "Metal",
+    "CustomModel": "Blocks/Dungeons/Book.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Custom/Book_Orbis_Sigil.png",
+        "Weight": 1
+      }
+    ],
+    "DrawType": "Model"
+  },
+  "IconProperties": {
+    "Scale": 0.8,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Translation": [
+      0,
+      -7
+    ]
+  },
+  "Consumable": false,
+  "MaxStack": 1,
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Arcanebench",
+        "Categories": [
+          "Arcane_Misc"
+        ]
+      }
+    ],
+    "TimeSeconds": 5,
+    "Input": [
+      {
+        "ItemId": "Ingredient_Voidheart",
+        "Quantity": 4
+      },
+      {
+        "ItemId": "Recipe_Book_Magic_Void",
+        "Quantity": 1
+      },
+      {
+        "ItemId": "Ingredient_Bar_Thorium",
+        "Quantity": 20
+      },
+      {
+        "ItemId": "Plant_Crop_Mana3",
+        "Quantity": 4
+      }
+    ],
+    "OutputQuantity": 1
+  },
+  "Quality": "Legendary"
+}

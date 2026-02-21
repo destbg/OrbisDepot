@@ -1,0 +1,22 @@
+{
+    "Group": "destbg",
+    "Name": "OrbisDepot",
+    "Version": "1.0.0",
+    "Description": "Description of your plugin",
+    "Authors": [
+        {
+            "Name": "destbg",
+            "Email": "",
+            "Url": "https://github.com/destbg"
+        }
+    ],
+    "Website": "https://github.com/destbg/OrbisDepot",
+    "DisabledByDefault": false,
+    "IncludesAssetPack": true,
+    "Dependencies": {},
+    "OptionalDependencies": {},
+    "LoadBefore": {},
+    "ServerVersion": "2026.02.19-1a311a592",
+    "Main": "com.destbg.OrbisDepot.Main",
+    "SubPlugins": []
+}
