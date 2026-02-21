@@ -1,6 +1,6 @@
 # Orbis Depot
 
-A Hytale server mod that adds a shared (per-player) void storage system — think of it as a magical chest network that follows you around. Inspired by Satisfactory's Dimensional Depot.
+A Hytale mod that adds a shared (per-player) void storage system — think of it as a magical chest network that follows you around. Inspired by Satisfactory's Dimensional Depot.
 
 ## What it does
 
