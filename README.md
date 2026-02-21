@@ -14,25 +14,25 @@ A Hytale mod that adds a shared (per-player) void storage system. Think of it as
 
 ### You can deposit items from the Orbis Depot and Orbis Sigil
 
-[![Depositing items](https://github.com/destbg/OrbisDepot/raw/main/docs/sigil_depositing.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/sigil_depositing.gif)
+[![Depositing items](https://github.com/destbg/OrbisDepot/raw/master/docs/sigil_depositing.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/sigil_depositing.gif)
 
 ### You can deposit items into the Orbis Depot using other storage mods
 
-[![Conveyor Transfer](https://github.com/destbg/OrbisDepot/raw/main/docs/conveyor_transfer.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/conveyor_transfer.gif)
+[![Conveyor Transfer](https://github.com/destbg/OrbisDepot/raw/master/docs/conveyor_transfer.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/conveyor_transfer.gif)
 
-[![Conveyor Depositing](https://github.com/destbg/OrbisDepot/raw/main/docs/conveyor_depositing.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/conveyor_depositing.gif)
+[![Conveyor Depositing](https://github.com/destbg/OrbisDepot/raw/master/docs/conveyor_depositing.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/conveyor_depositing.gif)
 
 ### You can automatically replenish your placed items from your Orbis Sigil
 
-[![Auto Replenishing](https://github.com/destbg/OrbisDepot/raw/main/docs/auto_replenish.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/auto_replenish.gif)
+[![Auto Replenishing](https://github.com/destbg/OrbisDepot/raw/master/docs/auto_replenish.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/auto_replenish.gif)
 
 ### You can take items directly from your Sigil when crafting items
 
-[![Crafting Integration](https://github.com/destbg/OrbisDepot/raw/main/docs/crafting_integration.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/crafting_integration.gif)
+[![Crafting Integration](https://github.com/destbg/OrbisDepot/raw/master/docs/crafting_integration.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/crafting_integration.gif)
 
 ### And of course, you can easily take items from your storage
 
-[![Taking Items](https://github.com/destbg/OrbisDepot/raw/main/docs/take_items.gif)](https://github.com/destbg/OrbisDepot/blob/main/docs/take_items.gif)
+[![Taking Items](https://github.com/destbg/OrbisDepot/raw/master/docs/take_items.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/take_items.gif)
 
 ## How it works
 
