@@ -32,4 +32,8 @@ public final class Constants {
     public static final int PLAYER_INVENTORY_DISPLAY_SLOTS = PLAYER_INVENTORY_DISPLAY_ROWS * SLOTS_PER_ROW;
 
     public static final long REFRESH_INTERVAL_MS = 100;
+
+    public static final String SIGIL_ANIM_SET = "OrbisSpellbook";
+    public static final String SIGIL_OPEN_ANIM = "CastHurlCharging";
+    public static final String SIGIL_CLOSE_ANIM = "CastHurlCharged";
 }

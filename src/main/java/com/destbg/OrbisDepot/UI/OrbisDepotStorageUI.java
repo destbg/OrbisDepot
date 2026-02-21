@@ -10,6 +10,8 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.protocol.AnimationSlot;
+import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
@@ -83,7 +85,16 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         if (context instanceof OrbisDepotStorageContext.Depot depot) {
             triggerClose(depot);
         } else if (context instanceof OrbisDepotStorageContext.Sigil) {
-            SoundUtils.playSFXToPlayer("SFX_Orbis_Sigil_Close_Local", ref, store);
+            CompletableFuture.runAsync(() -> {
+                try {
+                    AnimationUtils.playAnimation(ref, AnimationSlot.Action,
+                            Constants.SIGIL_ANIM_SET, Constants.SIGIL_CLOSE_ANIM,
+                            true, store);
+                    SoundUtils.playSFXToPlayer("SFX_Orbis_Sigil_Close_Local", ref, store);
+                } catch (Throwable t) {
+                    LOGGER.at(Level.WARNING).withCause(t).log("Failed to play Sigil close animation");
+                }
+            }, context.getWorld());
         }
     }
 
