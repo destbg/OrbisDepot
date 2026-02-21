@@ -13,7 +13,7 @@ Group {
     LayoutMode: Top;
 
     $C.@CheckBoxWithLabel #AutoPlaceToggle {
-      @Text = "Auto-place from Depot";
+      @Text = "Auto-replenish from Depot";
       @Checked = true;
     }
 
