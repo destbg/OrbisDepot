@@ -35,37 +35,17 @@ public class OrbisDepotBlockState extends ItemContainerState implements BreakVal
             .append(new KeyedCodec<>("ItemContainer", SimpleItemContainer.CODEC),
                     (state, container) -> {
                         if (container != null) {
-                            setParentContainerField(state, container);
+                            state.itemContainer = container;
                         }
                     },
-                    OrbisDepotBlockState::getNativeContainer).add()
+                    s -> s.itemContainer).add()
             .append(new KeyedCodec<>("OwnerUUID", Codec.UUID_STRING),
-                    (state, uuid) -> state.ownerUUID = uuid,
-                    state -> state.ownerUUID).add()
-            .append(new KeyedCodec<>("OwnerName", Codec.STRING),
-                    (state, name) -> state.ownerName = name,
-                    state -> state.ownerName).add()
+                    (state, uuid) -> state.persistedOwnerUUID = uuid,
+                    state -> state.persistedOwnerUUID).add()
+            .append(new KeyedCodec<>("PositionKey", Codec.STRING),
+                    (state, key) -> state.positionKey = key,
+                    state -> state.positionKey).add()
             .build();
-
-    private static void setParentContainerField(OrbisDepotBlockState state, SimpleItemContainer container) {
-        try {
-            java.lang.reflect.Field f = ItemContainerState.class.getDeclaredField("itemContainer");
-            f.setAccessible(true);
-            f.set(state, container);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to set itemContainer field", e);
-        }
-    }
-
-    private SimpleItemContainer getNativeContainer() {
-        try {
-            java.lang.reflect.Field f = ItemContainerState.class.getDeclaredField("itemContainer");
-            f.setAccessible(true);
-            return (SimpleItemContainer) f.get(this);
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     @Override
     public ItemContainer getItemContainer() {
@@ -76,11 +56,9 @@ public class OrbisDepotBlockState extends ItemContainerState implements BreakVal
     }
 
     @Nullable
-    private UUID ownerUUID;
+    private UUID persistedOwnerUUID;
     @Nullable
-    private String ownerName;
-    @Nullable
-    private transient String positionKey;
+    private String positionKey;
 
     public OrbisDepotBlockState() {
         super();
@@ -101,24 +79,33 @@ public class OrbisDepotBlockState extends ItemContainerState implements BreakVal
                     resized.setItemStackForSlot(i, stack);
                 }
             }
-            setParentContainerField(this, resized);
+            super.itemContainer = resized;
             resized.registerChangeEvent(EventPriority.LAST, this::onItemChange);
         }
         return true;
     }
 
     public boolean isOwner(@Nonnull UUID playerUUID) {
-        return ownerUUID != null && ownerUUID.equals(playerUUID);
+        UUID effective = getOwnerUUID();
+        return effective != null && effective.equals(playerUUID);
     }
 
     @Nullable
     public UUID getOwnerUUID() {
-        return ownerUUID;
+        if (positionKey != null) {
+            UUID runtime = DepotSlotUtils.getOwner(positionKey);
+            if (runtime != null) {
+                return runtime;
+            }
+        }
+        return persistedOwnerUUID;
     }
 
-    public void setOwner(@Nonnull UUID uuid, @Nonnull String name) {
-        this.ownerUUID = uuid;
-        this.ownerName = name;
+    public void setOwner(@Nonnull UUID uuid) {
+        this.persistedOwnerUUID = uuid;
+        if (positionKey != null) {
+            DepotSlotUtils.registerDepot(positionKey, uuid);
+        }
     }
 
     public void setPositionKey(@Nonnull String posKey) {
@@ -147,14 +134,9 @@ public class OrbisDepotBlockState extends ItemContainerState implements BreakVal
             positionKey = DepotSlotUtils.posKey(worldX, y, worldZ);
         }
 
-        if (ownerUUID == null) {
-            ownerUUID = DepotSlotUtils.getOwner(positionKey);
-            if (ownerUUID == null) {
-                return;
-            }
+        if (DepotSlotUtils.getOwner(positionKey) == null && persistedOwnerUUID != null) {
+            DepotSlotUtils.registerDepot(positionKey, persistedOwnerUUID);
         }
-
-        DepotSlotUtils.registerDepot(positionKey, ownerUUID);
     }
 
     @Override
@@ -164,6 +146,22 @@ public class OrbisDepotBlockState extends ItemContainerState implements BreakVal
 
     @Override
     public boolean canDestroy(@Nonnull Ref<EntityStore> ref, @Nonnull ComponentAccessor<EntityStore> componentAccessor) {
+        if (positionKey != null && super.itemContainer != null) {
+            SimpleItemContainer uploadSlots = DepotSlotUtils.getUploadSlotContainer(positionKey);
+            for (short i = 0; i < uploadSlots.getCapacity(); i++) {
+                ItemStack stack = uploadSlots.getItemStack(i);
+                if (stack != null && !ItemStack.isEmpty(stack)) {
+                    for (short j = 0; j < super.itemContainer.getCapacity(); j++) {
+                        ItemStack existing = super.itemContainer.getItemStack(j);
+                        if (existing == null || ItemStack.isEmpty(existing)) {
+                            super.itemContainer.setItemStackForSlot(j, stack);
+                            break;
+                        }
+                    }
+                    uploadSlots.removeItemStackFromSlot(i);
+                }
+            }
+        }
         return true;
     }
 

@@ -23,9 +23,19 @@ final class DepositSectionUI {
 
     private final OrbisDepotStorageContext context;
     private volatile boolean lastDepositHasItems = false;
+    private volatile UUID targetOwnerOverride;
 
     DepositSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
+    }
+
+    void setTargetOwner(UUID ownerUUID) {
+        this.targetOwnerOverride = ownerUUID;
+    }
+
+    private UUID getEffectiveOwner() {
+        UUID override = targetOwnerOverride;
+        return override != null ? override : context.getOwnerUUID();
     }
 
     boolean hasDepositStateChanged() {
@@ -240,7 +250,7 @@ final class DepositSectionUI {
     }
 
     private boolean isDepositSlotAtCapacity() {
-        UUID owner = context.getOwnerUUID();
+        UUID owner = getEffectiveOwner();
         if (owner == null) {
             return false;
         }

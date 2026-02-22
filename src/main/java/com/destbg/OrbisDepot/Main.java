@@ -3,9 +3,11 @@ package com.destbg.OrbisDepot;
 import com.destbg.OrbisDepot.Crafting.OrbisFieldCraftingWindow;
 import com.destbg.OrbisDepot.Crafting.PlaceBlockDepotSystem;
 import com.destbg.OrbisDepot.Crafting.UseBlockCraftingSystem;
+import com.destbg.OrbisDepot.Interactions.ConsumeAttunementInteraction;
 import com.destbg.OrbisDepot.Interactions.OpenCrudeOrbisSigilInteraction;
 import com.destbg.OrbisDepot.Interactions.OpenOrbisDepotInteraction;
 import com.destbg.OrbisDepot.Interactions.OpenOrbisSigilInteraction;
+import com.destbg.OrbisDepot.Storage.AttunementManager;
 import com.destbg.OrbisDepot.State.OrbisDepotBlockState;
 import com.destbg.OrbisDepot.Storage.PlayerSettingsManager;
 import com.destbg.OrbisDepot.Storage.VoidStorageManager;
@@ -23,7 +25,6 @@ import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -49,6 +50,7 @@ public class Main extends JavaPlugin {
         this.getCodecRegistry(Interaction.CODEC).register("Crude_Orbis_Sigil_Open", OpenCrudeOrbisSigilInteraction.class, OpenCrudeOrbisSigilInteraction.CODEC);
         this.getCodecRegistry(Interaction.CODEC).register("Orbis_Sigil_Open", OpenOrbisSigilInteraction.class, OpenOrbisSigilInteraction.CODEC);
         this.getCodecRegistry(Interaction.CODEC).register("Orbis_Depot_Open", OpenOrbisDepotInteraction.class, OpenOrbisDepotInteraction.CODEC);
+        this.getCodecRegistry(Interaction.CODEC).register("Orbis_Depot_Attune", ConsumeAttunementInteraction.class, ConsumeAttunementInteraction.CODEC);
 
         this.getEntityStoreRegistry().registerSystem(new UseBlockCraftingSystem());
         this.getEntityStoreRegistry().registerSystem(new PlaceBlockDepotSystem());
@@ -75,6 +77,8 @@ public class Main extends JavaPlugin {
             LOGGER.at(Level.INFO).log("SigilSlotUtils initialized.");
             CrudeSigilSlotUtils.init(getDataDirectory());
             LOGGER.at(Level.INFO).log("CrudeSigilSlotUtils initialized.");
+            AttunementManager.init(getDataDirectory());
+            LOGGER.at(Level.INFO).log("AttunementManager initialized.");
             DepotSlotUtils.init(getDataDirectory());
             LOGGER.at(Level.INFO).log("DepotSlotUtils initialized.");
 
@@ -150,6 +154,12 @@ public class Main extends JavaPlugin {
             DepotSlotUtils.saveAll();
         } catch (Exception e) {
             LOGGER.at(Level.SEVERE).withCause(e).log("Error saving depot slots on shutdown");
+        }
+
+        try {
+            AttunementManager.get().saveAll();
+        } catch (Exception e) {
+            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving attunements on shutdown");
         }
 
         LOGGER.at(Level.INFO).log("Plugin shut down.");

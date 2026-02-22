@@ -1,0 +1,22 @@
+$C = "../Common.ui";
+
+Group {
+  Padding: (Left: 8, Right: 8, Top: 3, Bottom: 3);
+
+  Group #AttunementCheckbox {
+    LayoutMode: Left;
+
+    $C.@CheckBox #CheckBox {
+      Value: false;
+    }
+
+    Label #AttunementLabel {
+      Text: "Player";
+      Anchor: (Right: 30, Left: 11);
+      Style: (
+        ...$C.@DefaultLabelStyle,
+        VerticalAlignment: Center
+      );
+    }
+  }
+}

@@ -26,6 +26,7 @@ public final class DepotSlotUtils {
     private static final Map<String, SimpleItemContainer> UPLOAD_SLOTS = new ConcurrentHashMap<>();
     private static final Map<String, float[]> UPLOAD_TIMERS = new ConcurrentHashMap<>();
     private static final Map<String, UUID> SLOT_OWNERS = new ConcurrentHashMap<>();
+    private static final Map<String, UUID> DEPOSIT_TARGETS = new ConcurrentHashMap<>();
 
     private static Path storageDir;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -78,10 +79,24 @@ public final class DepotSlotUtils {
         return SLOT_OWNERS.get(posKey);
     }
 
+    public static void setDepositTarget(@Nonnull String posKey, @Nonnull UUID targetUUID) {
+        DEPOSIT_TARGETS.put(posKey, targetUUID);
+    }
+
+    @Nonnull
+    public static UUID getDepositTarget(@Nonnull String posKey) {
+        UUID target = DEPOSIT_TARGETS.get(posKey);
+        if (target != null) {
+            return target;
+        }
+        UUID owner = SLOT_OWNERS.get(posKey);
+        return owner != null ? owner : UUID.randomUUID();
+    }
+
     public static void tickAll(float deltaSeconds) {
         for (Map.Entry<String, UUID> entry : SLOT_OWNERS.entrySet()) {
             String posKey = entry.getKey();
-            UUID owner = entry.getValue();
+            UUID depositTarget = getDepositTarget(posKey);
             SimpleItemContainer container = UPLOAD_SLOTS.get(posKey);
             if (container == null) {
                 continue;
@@ -97,7 +112,7 @@ public final class DepotSlotUtils {
             timers[0] += deltaSeconds;
             while (timers[0] >= Constants.UPLOAD_INTERVAL_DEPOT_SECONDS) {
                 timers[0] -= Constants.UPLOAD_INTERVAL_DEPOT_SECONDS;
-                if (!DepositUtils.processSlot(container, (short) 0, owner, 1)) {
+                if (!DepositUtils.processSlot(container, (short) 0, depositTarget, 1)) {
                     timers[0] = 0f;
                     break;
                 }

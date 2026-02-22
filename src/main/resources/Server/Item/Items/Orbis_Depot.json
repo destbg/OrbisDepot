@@ -121,7 +121,8 @@
         "Id": "Workbench",
         "Categories": [
           "Workbench_Tinkering"
-        ]
+        ],
+        "RequiredTierLevel": 2
       }
     ],
     "TimeSeconds": 5,

@@ -16,8 +16,29 @@ Group {
     Group {
       LayoutMode: Left;
 
-      Group {
+      Group #AttunementPlaceholder {
         Anchor: (Width: 288);
+      }
+
+      $C.@DecoratedContainer #AttunementContainer {
+        Anchor: (Width: 280, Height: 360);
+
+        #Title {
+          $C.@Title #AttunementTitle {
+            @Text = "ATTUNED DEPOTS";
+          }
+        }
+
+        #Content {
+          Group #AttunementPanel {
+            Anchor: (Full: 0);
+            LayoutMode: Top;
+          }
+        }
+      }
+
+      Group #AttunementSpacer {
+        Anchor: (Width: 8);
       }
 
       $C.@DecoratedContainer {
@@ -56,24 +77,12 @@ Group {
         }
       }
 
-      Group {
+      Group #RightSpacer {
         Anchor: (Width: 8);
       }
 
-      $C.@DecoratedContainer {
-        Anchor: (Width: 280, Height: 360);
-
-        #Title {
-          $C.@Title #SettingsTitle {
-            @Text = "SETTINGS";
-          }
-        }
-
-        #Content {
-          Group #SettingsPanel {
-            Anchor: (Full: 0);
-          }
-        }
+      Group #RightSpacerPanel {
+        Anchor: (Width: 280);
       }
     }
   }

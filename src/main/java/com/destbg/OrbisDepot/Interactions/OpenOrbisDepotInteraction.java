@@ -2,6 +2,7 @@ package com.destbg.OrbisDepot.Interactions;
 
 import com.destbg.OrbisDepot.Main;
 import com.destbg.OrbisDepot.State.OrbisDepotBlockState;
+import com.destbg.OrbisDepot.Storage.AttunementManager;
 import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.BlockStateUtils;
@@ -30,6 +31,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -98,22 +100,25 @@ public class OpenOrbisDepotInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        String posKey = DepotSlotUtils.posKey(pos.getX(), pos.getY(), pos.getZ());
+        depotState.setPositionKey(posKey);
+
         if (depotState.getOwnerUUID() == null) {
-            depotState.setOwner(playerRef.getUuid(), playerRef.getUsername());
-        } else if (!depotState.isOwner(playerRef.getUuid())) {
+            depotState.setOwner(playerRef.getUuid());
+        } else if (!depotState.isOwner(playerRef.getUuid())
+                && !AttunementManager.get().isAttunedTo(playerRef.getUuid(), depotState.getOwnerUUID())) {
             player.sendMessage(Message.raw("You are not the owner of this Orbis Depot.").color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
-        String posKey = DepotSlotUtils.posKey(pos.getX(), pos.getY(), pos.getZ());
-        depotState.setPositionKey(posKey);
-        DepotSlotUtils.registerDepot(posKey, playerRef.getUuid());
+        UUID depotOwner = depotState.getOwnerUUID();
+        DepotSlotUtils.registerDepot(posKey, depotOwner);
 
         BlockStateUtils.setBlockInteractionState("OpenWindow", world, pos);
         SoundUtils.playSFX("SFX_Chest_Wooden_Open", pos.getX(), pos.getY(), pos.getZ(), store);
 
-        OrbisDepotStorageContext context = new OrbisDepotStorageContext.Depot(posKey, playerRef.getUuid(), world);
+        OrbisDepotStorageContext context = new OrbisDepotStorageContext.Depot(posKey, depotOwner, world);
         CompletableFuture.runAsync(() -> {
             try {
                 Player p = store.getComponent(ref, Player.getComponentType());

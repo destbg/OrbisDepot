@@ -3,12 +3,12 @@
     "Animations": {
         "CastHurlCharging": {
             "ThirdPerson": "Characters/Custom/Orbis_Sigil_Open.blockyanim",
-            "FirstPerson": "Characters/Custom/Orbis_Sigil_Open.blockyanim",
+            "FirstPerson": "Characters/Custom/Orbis_Sigil_Open_FPS.blockyanim",
             "Speed": 1
         },
         "CastHurlCharged": {
             "ThirdPerson": "Characters/Custom/Orbis_Sigil_Close.blockyanim",
-            "FirstPerson": "Characters/Custom/Orbis_Sigil_Close.blockyanim",
+            "FirstPerson": "Characters/Custom/Orbis_Sigil_Close_FPS.blockyanim",
             "Speed": 1,
             "BlendingDuration": 0
         }

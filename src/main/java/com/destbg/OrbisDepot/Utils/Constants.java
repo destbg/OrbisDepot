@@ -37,6 +37,10 @@ public final class Constants {
 
     public static final long REFRESH_INTERVAL_MS = 100;
 
+    public static final String ATTUNEMENT_ITEM_ID = "Orbis_Depot_Attunement";
+    public static final String META_CRAFTER_UUID = "orbis_crafter_uuid";
+    public static final String META_CRAFTER_NAME = "orbis_crafter_name";
+
     public static final String SIGIL_ANIM_SET = "OrbisSpellbook";
     public static final String SIGIL_OPEN_ANIM = "CastHurlCharging";
     public static final String SIGIL_CLOSE_ANIM = "CastHurlCharged";

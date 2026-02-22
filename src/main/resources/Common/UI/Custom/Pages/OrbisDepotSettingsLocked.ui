@@ -1,0 +1,51 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  Group {
+    Anchor: (Height: 8);
+  }
+
+  Group {
+    Padding: (Left: 12, Right: 12);
+    LayoutMode: Top;
+
+    Label {
+      Text: "Auto-replenish from Depot";
+      Style: (FontSize: 14, TextColor: #4a5568);
+      Anchor: (Height: 22);
+    }
+
+    Group {
+      Anchor: (Height: 6);
+    }
+
+    Label {
+      Text: "Crafting integration";
+      Style: (FontSize: 14, TextColor: #4a5568);
+      Anchor: (Height: 22);
+    }
+
+    Group {
+      Anchor: (Height: 12);
+    }
+
+    $C.@ContentSeparator {}
+
+    Group {
+      Anchor: (Height: 12);
+    }
+
+    Label {
+      Text: "Fully restore the Sigil to unlock these capabilities.";
+      Style: (FontSize: 12, TextColor: #96a9be, Wrap: true);
+      Anchor: (Width: 256);
+    }
+  }
+
+  Group {
+    FlexWeight: 1;
+  }
+}

@@ -42,7 +42,8 @@ public sealed interface OrbisDepotStorageContext permits OrbisDepotStorageContex
 
         @Override
         public boolean isAllowed(@Nonnull UUID playerUUID) {
-            return ownerUUID.equals(playerUUID);
+            return ownerUUID.equals(playerUUID)
+                    || AttunementManager.get().isAttunedTo(playerUUID, ownerUUID);
         }
 
         @Override

@@ -4,3 +4,5 @@ items.Orbis_Sigil.name=Orbis Sigil
 items.Orbis_Sigil.description=The fully restored version of the Crude Orbis Sigil, it is also more efficient than the crude version that can also replenish items as they are placed
 items.Crude_Orbis_Sigil.name=Crude Orbis Sigil
 items.Crude_Orbis_Sigil.description=Provides a single user with the ability to store items in the void and pull them out remotely from anywhere in the world
+items.Orbis_Depot_Attunement.name=Orbis Depot Attunement
+items.Orbis_Depot_Attunement.description=Allows the user to attune to another player's Orbis Depot, allowing them to access the items stored within it as well. One player must first use it to attune to their own Orbis Depot before another player can use it to attune to theirs.

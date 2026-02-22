@@ -27,9 +27,19 @@ final class StorageSectionUI {
     private final OrbisDepotStorageContext context;
     private final List<String> displayedItemIds = new ArrayList<>();
     private String searchQuery = "";
+    private volatile UUID viewingOwnerOverride;
 
     StorageSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
+    }
+
+    void setViewingOwner(UUID ownerUUID) {
+        this.viewingOwnerOverride = ownerUUID;
+    }
+
+    private UUID getEffectiveOwner() {
+        UUID override = viewingOwnerOverride;
+        return override != null ? override : context.getOwnerUUID();
     }
 
     String getSearchQuery() {
@@ -41,7 +51,7 @@ final class StorageSectionUI {
     }
 
     boolean hasStorageItemsChanged() {
-        UUID owner = context.getOwnerUUID();
+        UUID owner = getEffectiveOwner();
         if (owner == null) {
             return false;
         }
@@ -61,7 +71,7 @@ final class StorageSectionUI {
     }
 
     void build(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
-        UUID owner = context.getOwnerUUID();
+        UUID owner = getEffectiveOwner();
         if (owner == null) {
             return;
         }
@@ -102,7 +112,7 @@ final class StorageSectionUI {
     }
 
     void update(@NonNullDecl UICommandBuilder cmd) {
-        UUID owner = context.getOwnerUUID();
+        UUID owner = getEffectiveOwner();
         if (owner == null) {
             return;
         }
@@ -120,7 +130,7 @@ final class StorageSectionUI {
     }
 
     void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem, ItemTransferUtil transferUtil) {
-        UUID owner = context.getOwnerUUID();
+        UUID owner = getEffectiveOwner();
         if (owner == null) {
             return;
         }

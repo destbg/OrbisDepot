@@ -1,10 +1,12 @@
 package com.destbg.OrbisDepot.UI;
 
 import com.destbg.OrbisDepot.Models.StorageModel;
+import com.destbg.OrbisDepot.Storage.AttunementManager;
 import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.BlockStateUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
+import com.destbg.OrbisDepot.Utils.DepotSlotUtils;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -47,6 +49,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     private final DepositSectionUI depositSection;
     private final StorageSectionUI storageSection;
     private final InventorySectionUI inventorySection;
+    private final AttunementSectionUI attunementSection;
     @Nullable
     private final SettingsSectionUI settingsSection;
 
@@ -54,17 +57,35 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     private volatile Store<EntityStore> lastStore;
     private volatile ScheduledFuture<?> refreshTask;
     private volatile boolean pageOpen = false;
+    private volatile long lastAttunementUpdateMs;
 
     public OrbisDepotStorageUI(@Nonnull PlayerRef playerRef, @Nonnull OrbisDepotStorageContext context) {
         super(playerRef, CustomPageLifetime.CanDismiss, StorageModel.CODEC);
         this.playerRef = playerRef;
         this.context = context;
+        AttunementManager.get().registerPlayerName(playerRef.getUuid(), playerRef.getUsername());
         this.depositSection = new DepositSectionUI(context);
         this.storageSection = new StorageSectionUI(context);
         this.inventorySection = new InventorySectionUI();
-        this.settingsSection = (context instanceof OrbisDepotStorageContext.Sigil)
-                ? new SettingsSectionUI(playerRef.getUuid())
-                : null;
+
+        String contextKey = switch (context) {
+            case OrbisDepotStorageContext.Depot depot -> "depot:" + depot.posKey();
+            case OrbisDepotStorageContext.Sigil _ -> "sigil:" + playerRef.getUuid();
+            case OrbisDepotStorageContext.CrudeSigil _ -> "crude:" + playerRef.getUuid();
+        };
+        boolean isOwnerView = context instanceof OrbisDepotStorageContext.Sigil
+                || context instanceof OrbisDepotStorageContext.CrudeSigil;
+        this.attunementSection = new AttunementSectionUI(playerRef.getUuid(), playerRef.getUsername(), isOwnerView, contextKey);
+
+        if (context instanceof OrbisDepotStorageContext.Sigil) {
+            this.settingsSection = new SettingsSectionUI(playerRef.getUuid(), false);
+        } else if (context instanceof OrbisDepotStorageContext.CrudeSigil) {
+            this.settingsSection = new SettingsSectionUI(playerRef.getUuid(), true);
+        } else {
+            this.settingsSection = null;
+        }
+
+        syncSelectedTarget();
     }
 
     @Override
@@ -114,6 +135,20 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
 
         String action = data.getAction();
         if (action != null) {
+            if (attunementSection.handleAction(action)) {
+                syncSelectedTarget();
+                long now = System.currentTimeMillis();
+                if (now - lastAttunementUpdateMs < 100) {
+                    return;
+                }
+                lastAttunementUpdateMs = now;
+                if (attunementSection.hasAttunements()) {
+                    sendAttunementUpdate(ref, store);
+                } else {
+                    sendActionUpdate(ref, store);
+                }
+                return;
+            }
             if (action.startsWith("deposit:")) {
                 depositSection.handleDeposit(ref, store, action.substring("deposit:".length()), this::giveToPlayer);
                 sendActionUpdate(ref, store);
@@ -153,7 +188,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
 
     private void buildPage(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt, @NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
         boolean showSettings = settingsSection != null;
-        cmd.append(showSettings ? "Pages/OrbisDepotStorage.ui" : "Pages/OrbisDepotStorage_NoSettings.ui");
+        cmd.append(showSettings ? "Pages/OrbisSigilStorage.ui" : "Pages/OrbisDepotStorage.ui");
 
         String title = switch (context) {
             case OrbisDepotStorageContext.Depot _ -> "Orbis Depot";
@@ -165,10 +200,21 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput",
                 EventData.of(Constants.KEY_SEARCH_QUERY, "#SearchInput.Value"), false);
 
+        boolean showAttunement = attunementSection.hasAttunements();
+        if (showAttunement) {
+            cmd.remove("#AttunementPlaceholder");
+        } else {
+            cmd.remove("#AttunementContainer");
+            cmd.remove("#AttunementSpacer");
+        }
+
         cmd.append("#DepositPanel", "Pages/OrbisDepotDepositSection.ui");
         cmd.append("#StoragePanel", "Pages/OrbisDepotStorageSection.ui");
         cmd.append("#InventoryPanel", "Pages/OrbisDepotInventorySection.ui");
 
+        if (showAttunement) {
+            attunementSection.build(cmd, evt);
+        }
         storageSection.build(cmd, evt);
         depositSection.build(cmd, evt);
         inventorySection.build(ref, cmd, evt, store);
@@ -206,9 +252,15 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         boolean storageChanged = storageSection.hasStorageItemsChanged();
         boolean depositChanged = depositSection.hasDepositStateChanged();
         boolean inventoryChanged = inventorySection.hasInventoryChanged(ref, store);
+        boolean showAttunement = attunementSection.hasAttunements();
+        boolean attunementChanged = showAttunement && attunementSection.hasChanged();
 
         UICommandBuilder cmd = new UICommandBuilder();
         UIEventBuilder evt = new UIEventBuilder();
+
+        if (attunementChanged) {
+            attunementSection.build(cmd, evt);
+        }
 
         if (storageChanged) {
             storageSection.build(cmd, evt);
@@ -233,11 +285,37 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         sendUpdate(cmd, evt, false);
     }
 
+    private void sendAttunementUpdate(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
+        UICommandBuilder cmd = new UICommandBuilder();
+        UIEventBuilder evt = new UIEventBuilder();
+        attunementSection.build(cmd, evt);
+        storageSection.build(cmd, evt);
+        depositSection.build(cmd, evt);
+        inventorySection.build(ref, cmd, evt, store);
+        if (settingsSection != null) {
+            settingsSection.bindEvents(evt);
+        }
+        sendUpdate(cmd, evt, false);
+    }
+
     private void sendActionUpdate(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
         UICommandBuilder cmd = new UICommandBuilder();
         UIEventBuilder evt = new UIEventBuilder();
         buildPage(cmd, evt, ref, store);
         sendUpdate(cmd, evt, true);
+    }
+
+    private void syncSelectedTarget() {
+        UUID selected = attunementSection.getSelectedOwnerUUID();
+        UUID myUUID = playerRef.getUuid();
+        UUID target = selected != null ? selected : myUUID;
+        storageSection.setViewingOwner(target);
+
+        if (context instanceof OrbisDepotStorageContext.Depot depot) {
+            depositSection.setTargetOwner(target);
+            DepotSlotUtils.setDepositTarget(depot.posKey(), target);
+            DepotSlotUtils.registerDepot(depot.posKey(), target);
+        }
     }
 
     private void triggerClose(OrbisDepotStorageContext.Depot depot) {
