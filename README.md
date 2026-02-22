@@ -7,6 +7,7 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 - **Orbis Depot**: a placeable chest block that uploads items into your personal void storage.
 - **Orbis Sigil**: a hand-held book to manage storage from anywhere.
 - **Crude Orbis Sigil**: a cheaper version of the Orbis Sigil that is slower and doesn't have crafting integration or auto-replenish.
+- **Orbis Depot Attunement**: a crafting recipe that allows you to link your Orbis Depot to that of another player.
 - **Pocket crafting integration**: if you have a Sigil in your inventory, crafting can pull ingredients from void storage.
 - **Auto-replenish placed blocks**: also with Sigil, your placed blocks can be topped up from storage.
 - **Automation-friendly**: designed to play nicely with external storage/network mods.
@@ -30,6 +31,10 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 ### You can take items directly from your Sigil when crafting items
 
 [![Crafting Integration](https://github.com/destbg/OrbisDepot/raw/master/docs/crafting_integration.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/crafting_integration.gif)
+
+### Attune other players' Depots to your Sigil and access their storage as well
+
+[![Shared Depot](https://github.com/destbg/OrbisDepot/raw/master/docs/shared_depot.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/shared_depot.gif)
 
 ### And of course, you can easily take items from your storage
 
