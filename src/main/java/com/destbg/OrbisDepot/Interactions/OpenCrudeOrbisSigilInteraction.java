@@ -4,16 +4,18 @@ import com.destbg.OrbisDepot.Main;
 import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
 import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -27,12 +29,12 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class OpenOrbisSigilInteraction extends SimpleInstantInteraction {
+public class OpenCrudeOrbisSigilInteraction extends SimpleInstantInteraction {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenOrbisSigilInteraction> CODEC = BuilderCodec.builder(
-            OpenOrbisSigilInteraction.class, OpenOrbisSigilInteraction::new, SimpleInstantInteraction.CODEC
+    public static final BuilderCodec<OpenCrudeOrbisSigilInteraction> CODEC = BuilderCodec.builder(
+            OpenCrudeOrbisSigilInteraction.class, OpenCrudeOrbisSigilInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
     @Override
@@ -67,8 +69,14 @@ public class OpenOrbisSigilInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        if (InventoryUtils.hasOrbisSigil(player.getInventory())) {
+            player.sendMessage(Message.raw("You cannot use the Crude Orbis Sigil while you have the fully restored version on you.").color("#ff6b6b"));
+            interactionContext.getState().state = InteractionState.Failed;
+            return;
+        }
+
         World world = commandBuffer.getExternalData().getWorld();
-        OrbisDepotStorageContext context = new OrbisDepotStorageContext.Sigil(playerRef, world);
+        OrbisDepotStorageContext context = new OrbisDepotStorageContext.CrudeSigil(playerRef, world);
         CompletableFuture.runAsync(() -> {
             try {
                 Player p = store.getComponent(ref, Player.getComponentType());
@@ -80,7 +88,7 @@ public class OpenOrbisSigilInteraction extends SimpleInstantInteraction {
                     p.getPageManager().openCustomPage(ref, store, new OrbisDepotStorageUI(playerRef, context));
                 }
             } catch (Throwable t) {
-                LOGGER.at(Level.SEVERE).withCause(t).log("Failed to open Sigil UI");
+                LOGGER.at(Level.SEVERE).withCause(t).log("Failed to open Crude Sigil UI");
             }
         }, world);
     }

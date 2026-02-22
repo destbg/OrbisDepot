@@ -26,6 +26,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -46,6 +47,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     private final DepositSectionUI depositSection;
     private final StorageSectionUI storageSection;
     private final InventorySectionUI inventorySection;
+    @Nullable
     private final SettingsSectionUI settingsSection;
 
     private volatile Ref<EntityStore> lastRef;
@@ -60,7 +62,9 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         this.depositSection = new DepositSectionUI(context);
         this.storageSection = new StorageSectionUI(context);
         this.inventorySection = new InventorySectionUI();
-        this.settingsSection = new SettingsSectionUI(playerRef.getUuid());
+        this.settingsSection = (context instanceof OrbisDepotStorageContext.Sigil)
+                ? new SettingsSectionUI(playerRef.getUuid())
+                : null;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
 
         if (context instanceof OrbisDepotStorageContext.Depot depot) {
             triggerClose(depot);
-        } else if (context instanceof OrbisDepotStorageContext.Sigil) {
+        } else if (context instanceof OrbisDepotStorageContext.Sigil || context instanceof OrbisDepotStorageContext.CrudeSigil) {
             CompletableFuture.runAsync(() -> {
                 try {
                     AnimationUtils.playAnimation(ref, AnimationSlot.Action,
@@ -133,7 +137,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         }
 
         String checkbox = data.getCheckbox();
-        if (checkbox != null && settingsSection.handleCheckbox(checkbox)) {
+        if (checkbox != null && settingsSection != null && settingsSection.handleCheckbox(checkbox)) {
             sendActionUpdate(ref, store);
             return;
         }
@@ -148,8 +152,14 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     }
 
     private void buildPage(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt, @NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
-        cmd.append("Pages/OrbisDepotStorage.ui");
-        String title = (context instanceof OrbisDepotStorageContext.Depot) ? "Orbis Depot" : "Orbis Sigil";
+        boolean showSettings = settingsSection != null;
+        cmd.append(showSettings ? "Pages/OrbisDepotStorage.ui" : "Pages/OrbisDepotStorage_NoSettings.ui");
+
+        String title = switch (context) {
+            case OrbisDepotStorageContext.Depot _ -> "Orbis Depot";
+            case OrbisDepotStorageContext.Sigil _ -> "Orbis Sigil";
+            case OrbisDepotStorageContext.CrudeSigil _ -> "Crude Orbis Sigil";
+        };
         cmd.set("#TitleText.Text", title);
         cmd.set("#SearchInput.Value", storageSection.getSearchQuery());
         evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput",
@@ -162,7 +172,9 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         storageSection.build(cmd, evt);
         depositSection.build(cmd, evt);
         inventorySection.build(ref, cmd, evt, store);
-        settingsSection.build(cmd, evt);
+        if (settingsSection != null) {
+            settingsSection.build(cmd, evt);
+        }
     }
 
     private void startRefreshTask() {
@@ -214,7 +226,9 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
             inventorySection.build(ref, cmd, evt, store);
         }
 
-        settingsSection.bindEvents(evt);
+        if (settingsSection != null) {
+            settingsSection.bindEvents(evt);
+        }
 
         sendUpdate(cmd, evt, false);
     }

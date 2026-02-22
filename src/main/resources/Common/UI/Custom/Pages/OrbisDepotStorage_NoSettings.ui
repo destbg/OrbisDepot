@@ -1,0 +1,75 @@
+$C = "../Common.ui";
+
+$C.@PageOverlay {}
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  Group {
+    FlexWeight: 1;
+  }
+
+  Group {
+    LayoutMode: Center;
+
+    Group {
+      LayoutMode: Left;
+
+      $C.@DecoratedContainer {
+        Anchor: (Width: 720, Height: 360);
+
+        #Title {
+          Group {
+            LayoutMode: Left;
+            Anchor: (Full: 0);
+
+            $C.@Title #TitleText {
+              @Text = "ORBIS DEPOT";
+              @Alignment = Start;
+            }
+
+            Group {
+              FlexWeight: 1;
+            }
+
+            $C.@HeaderSearch {}
+          }
+        }
+
+        #Content {
+          LayoutMode: Left;
+
+          Group #DepositPanel {
+            Anchor: (Width: 200);
+          }
+
+          $C.@VerticalSeparator {}
+
+          Group #StoragePanel {
+            FlexWeight: 1;
+          }
+        }
+      }
+    }
+  }
+
+  Group {
+    Anchor: (Height: 8);
+  }
+
+  Group {
+    LayoutMode: Center;
+
+    Group #InventoryPanel {
+      Anchor: (Width: 720);
+    }
+  }
+
+  Group {
+    Anchor: (Height: 30);
+  }
+}
+
+$C.@BackButton {}
+

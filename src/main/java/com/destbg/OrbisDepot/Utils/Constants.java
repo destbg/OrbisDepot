@@ -11,6 +11,7 @@ public final class Constants {
 
     public static final String DEPOT_ITEM_ID = "Orbis_Depot";
     public static final String SIGIL_ITEM_ID = "Orbis_Sigil";
+    public static final String CRUDE_SIGIL_ITEM_ID = "Crude_Orbis_Sigil";
 
     public static final String KEY_ACTION = "Action";
     public static final String KEY_SEARCH_QUERY = "@SearchQuery";
@@ -23,9 +24,12 @@ public final class Constants {
     public static final String CHECKBOX_AUTO_PLACE = "AutoPlace";
     public static final String CHECKBOX_CRAFTING = "Crafting";
 
-    public static final float UPLOAD_INTERVAL_SECONDS = 2.0f;
+    public static final float UPLOAD_INTERVAL_DEPOT_SECONDS = 2.0f;
+    public static final float UPLOAD_INTERVAL_SIGIL_SECONDS = 2.0f;
+    public static final float UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS = 4.0f;
     public static final short DEPOT_CAPACITY = 1;
     public static final short SIGIL_UPLOAD_SLOT_CAPACITY = 4;
+    public static final short CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY = 2;
 
     public static final int PLAYER_INVENTORY_DISPLAY_ROWS = 5;
     public static final int SLOTS_PER_ROW = 9;

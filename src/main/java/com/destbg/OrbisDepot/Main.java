@@ -3,6 +3,7 @@ package com.destbg.OrbisDepot;
 import com.destbg.OrbisDepot.Crafting.OrbisFieldCraftingWindow;
 import com.destbg.OrbisDepot.Crafting.PlaceBlockDepotSystem;
 import com.destbg.OrbisDepot.Crafting.UseBlockCraftingSystem;
+import com.destbg.OrbisDepot.Interactions.OpenCrudeOrbisSigilInteraction;
 import com.destbg.OrbisDepot.Interactions.OpenOrbisDepotInteraction;
 import com.destbg.OrbisDepot.Interactions.OpenOrbisSigilInteraction;
 import com.destbg.OrbisDepot.State.OrbisDepotBlockState;
@@ -10,6 +11,7 @@ import com.destbg.OrbisDepot.Storage.PlayerSettingsManager;
 import com.destbg.OrbisDepot.Storage.VoidStorageManager;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.CraftingUtils;
+import com.destbg.OrbisDepot.Utils.CrudeSigilSlotUtils;
 import com.destbg.OrbisDepot.Utils.DepotSlotUtils;
 import com.destbg.OrbisDepot.Utils.SigilSlotUtils;
 import com.hypixel.hytale.component.ComponentType;
@@ -44,6 +46,7 @@ public class Main extends JavaPlugin {
 
     @Override
     protected void setup() {
+        this.getCodecRegistry(Interaction.CODEC).register("Crude_Orbis_Sigil_Open", OpenCrudeOrbisSigilInteraction.class, OpenCrudeOrbisSigilInteraction.CODEC);
         this.getCodecRegistry(Interaction.CODEC).register("Orbis_Sigil_Open", OpenOrbisSigilInteraction.class, OpenOrbisSigilInteraction.CODEC);
         this.getCodecRegistry(Interaction.CODEC).register("Orbis_Depot_Open", OpenOrbisDepotInteraction.class, OpenOrbisDepotInteraction.CODEC);
 
@@ -70,6 +73,8 @@ public class Main extends JavaPlugin {
             LOGGER.at(Level.INFO).log("PlayerSettingsManager initialized.");
             SigilSlotUtils.init(getDataDirectory());
             LOGGER.at(Level.INFO).log("SigilSlotUtils initialized.");
+            CrudeSigilSlotUtils.init(getDataDirectory());
+            LOGGER.at(Level.INFO).log("CrudeSigilSlotUtils initialized.");
             DepotSlotUtils.init(getDataDirectory());
             LOGGER.at(Level.INFO).log("DepotSlotUtils initialized.");
 
@@ -86,6 +91,7 @@ public class Main extends JavaPlugin {
             depositScheduler.scheduleAtFixedRate(() -> {
                 try {
                     SigilSlotUtils.tickAll(0.1f);
+                    CrudeSigilSlotUtils.tickAll(0.1f);
                     DepotSlotUtils.tickAll(0.1f);
                 } catch (Exception e) {
                     LOGGER.at(Level.SEVERE).withCause(e).log("Error in deposit processor");
@@ -132,6 +138,12 @@ public class Main extends JavaPlugin {
             SigilSlotUtils.saveAll();
         } catch (Exception e) {
             LOGGER.at(Level.SEVERE).withCause(e).log("Error saving sigil slots on shutdown");
+        }
+
+        try {
+            CrudeSigilSlotUtils.saveAll();
+        } catch (Exception e) {
+            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving crude sigil slots on shutdown");
         }
 
         try {

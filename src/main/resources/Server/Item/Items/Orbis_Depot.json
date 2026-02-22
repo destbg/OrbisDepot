@@ -100,10 +100,20 @@
       }
     }
   },
+  "Model": "Blocks/Dungeons/Chest_Epic_Small.blockymodel",
+  "Texture": "Blocks/Custom/Chest_Orbis_Depot.png",
   "Scale": 0.6,
   "Variant": true,
   "ItemSoundSetId": "ISS_Items_Metal",
   "MaxStack": 10,
+  "Tags": {
+    "Type": [
+      "Furniture"
+    ],
+    "Family": [
+      "Temple"
+    ]
+  },
   "Recipe": {
     "BenchRequirement": [
       {
@@ -119,10 +129,6 @@
       {
         "ItemId": "Ingredient_Voidheart",
         "Quantity": 1
-      },
-      {
-        "ItemId": "Ingredient_Bar_Gold",
-        "Quantity": 5
       },
       {
         "ItemId": "Ingredient_Bar_Silver",

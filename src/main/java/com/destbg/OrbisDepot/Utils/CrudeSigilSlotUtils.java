@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-public final class SigilSlotUtils {
+public final class CrudeSigilSlotUtils {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -29,27 +29,27 @@ public final class SigilSlotUtils {
     private static final Type SLOT_LIST_TYPE = new TypeToken<List<SlotData>>() {
     }.getType();
 
-    private SigilSlotUtils() {
+    private CrudeSigilSlotUtils() {
     }
 
     public static void init(@Nonnull Path dataDirectory) {
-        storageDir = dataDirectory.resolve("sigil_slots");
+        storageDir = dataDirectory.resolve("crude_sigil_slots");
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to create sigil slots directory");
+            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to create crude sigil slots directory");
         }
         loadAll();
     }
 
     @Nonnull
     public static SimpleItemContainer getUploadSlotContainer(@Nonnull UUID playerUUID) {
-        return UPLOAD_SLOTS.computeIfAbsent(playerUUID, _ -> new SimpleItemContainer(Constants.SIGIL_UPLOAD_SLOT_CAPACITY));
+        return UPLOAD_SLOTS.computeIfAbsent(playerUUID, _ -> new SimpleItemContainer(Constants.CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY));
     }
 
     @Nonnull
     public static float[] getTimers(@Nonnull UUID playerUUID) {
-        return UPLOAD_TIMERS.computeIfAbsent(playerUUID, _ -> new float[Constants.SIGIL_UPLOAD_SLOT_CAPACITY]);
+        return UPLOAD_TIMERS.computeIfAbsent(playerUUID, _ -> new float[Constants.CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY]);
     }
 
     public static void resetTimers(@Nonnull UUID playerUUID) {
@@ -64,7 +64,6 @@ public final class SigilSlotUtils {
         if (timers == null || slot < 0 || slot >= timers.length) {
             return 0f;
         }
-
         return timers[slot];
     }
 
@@ -85,9 +84,9 @@ public final class SigilSlotUtils {
 
                 if (slot < timers.length) {
                     timers[slot] += deltaSeconds;
-                    while (timers[slot] >= Constants.UPLOAD_INTERVAL_SIGIL_SECONDS) {
-                        timers[slot] -= Constants.UPLOAD_INTERVAL_SIGIL_SECONDS;
-                        if (DepositUtils.processSlot(container, slot, playerUUID, 2)) {
+                    while (timers[slot] >= Constants.UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS) {
+                        timers[slot] -= Constants.UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS;
+                        if (DepositUtils.processSlot(container, slot, playerUUID, 1)) {
                             timers[slot] = 0f;
                             break;
                         }
@@ -129,10 +128,10 @@ public final class SigilSlotUtils {
                     saved++;
                 }
             } catch (IOException e) {
-                LOGGER.at(Level.SEVERE).withCause(e).log("Failed to save sigil slots for %s", playerUUID);
+                LOGGER.at(Level.SEVERE).withCause(e).log("Failed to save crude sigil slots for %s", playerUUID);
             }
         }
-        LOGGER.at(Level.INFO).log("Saved sigil deposit slots for %d players.", saved);
+        LOGGER.at(Level.INFO).log("Saved crude sigil deposit slots for %d players.", saved);
     }
 
     private static void loadAll() {
@@ -141,9 +140,9 @@ public final class SigilSlotUtils {
         }
 
         try (Stream<Path> files = Files.list(storageDir)) {
-            files.filter(f -> f.toString().endsWith(".json")).forEach(SigilSlotUtils::loadFile);
+            files.filter(f -> f.toString().endsWith(".json")).forEach(CrudeSigilSlotUtils::loadFile);
         } catch (IOException e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to list sigil slot files");
+            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to list crude sigil slot files");
         }
     }
 
@@ -165,10 +164,11 @@ public final class SigilSlotUtils {
                 }
             }
         } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to load sigil slot file %s", file);
+            LOGGER.at(Level.SEVERE).withCause(e).log("Failed to load crude sigil slot file %s", file);
         }
     }
 
     private record SlotData(String itemId, int quantity) {
     }
 }
+

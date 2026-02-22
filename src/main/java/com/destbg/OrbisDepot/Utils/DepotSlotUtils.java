@@ -95,8 +95,8 @@ public final class DepotSlotUtils {
             }
 
             timers[0] += deltaSeconds;
-            while (timers[0] >= Constants.UPLOAD_INTERVAL_SECONDS) {
-                timers[0] -= Constants.UPLOAD_INTERVAL_SECONDS;
+            while (timers[0] >= Constants.UPLOAD_INTERVAL_DEPOT_SECONDS) {
+                timers[0] -= Constants.UPLOAD_INTERVAL_DEPOT_SECONDS;
                 if (!DepositUtils.processSlot(container, (short) 0, owner, 1)) {
                     timers[0] = 0f;
                     break;

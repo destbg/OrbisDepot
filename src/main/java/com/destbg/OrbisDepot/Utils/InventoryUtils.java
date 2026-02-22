@@ -15,14 +15,20 @@ public final class InventoryUtils {
         if (inv == null) {
             return false;
         }
-        ItemContainer combined = inv.getCombinedHotbarFirst();
-        if (combined == null) {
+        if (containerContains(inv.getCombinedHotbarFirst(), Constants.SIGIL_ITEM_ID)) {
+            return true;
+        }
+        return containerContains(inv.getBackpack(), Constants.SIGIL_ITEM_ID);
+    }
+
+    private static boolean containerContains(@Nullable ItemContainer container, String itemId) {
+        if (container == null) {
             return false;
         }
-        short cap = combined.getCapacity();
+        short cap = container.getCapacity();
         for (short i = 0; i < cap; i++) {
-            ItemStack stack = combined.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack) && Constants.SIGIL_ITEM_ID.equals(stack.getItemId())) {
+            ItemStack stack = container.getItemStack(i);
+            if (stack != null && !ItemStack.isEmpty(stack) && itemId.equals(stack.getItemId())) {
                 return true;
             }
         }

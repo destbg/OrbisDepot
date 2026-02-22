@@ -36,7 +36,7 @@ final class InventorySectionUI {
             return lastSnapshot != null;
         }
 
-        int slots = Math.min(Math.max(0, combined.getCapacity()), Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);
+        int slots = Math.clamp(combined.getCapacity(), 0, Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);
         if (lastSnapshot == null || lastSnapshot.length != slots) {
             return true;
         }
@@ -73,7 +73,7 @@ final class InventorySectionUI {
         }
 
         short invCap = combined.getCapacity();
-        int displaySlots = Math.min(Math.max(0, invCap), Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);
+        int displaySlots = Math.clamp(invCap, 0, Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);
 
         for (int row = 0; row < Constants.PLAYER_INVENTORY_DISPLAY_ROWS; row++) {
             cmd.appendInline("#PlayerInventoryCards", "Group { LayoutMode: Left; }");
@@ -92,7 +92,8 @@ final class InventorySectionUI {
                     if (stack.getQuantity() > 1) {
                         cmd.set(sel + " #QuantityLabel.Text", String.valueOf(stack.getQuantity()));
                     }
-                    if (!Constants.SIGIL_ITEM_ID.equals(stack.getItemId())) {
+                    String itemId = stack.getItemId();
+                    if (!Constants.SIGIL_ITEM_ID.equals(itemId) && !Constants.CRUDE_SIGIL_ITEM_ID.equals(itemId)) {
                         evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton",
                                 EventData.of(Constants.KEY_ACTION, "deposit:" + slotIndex));
                     }
