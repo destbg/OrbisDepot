@@ -10,11 +10,11 @@ import java.util.logging.Level;
 public final class BlockStateUtils {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static void setBlockInteractionState(String state, World world, Vector3i pos) {
+    public static void setBlockInteractionState(String state, World world, int x, int y, int z) {
         try {
-            BlockType blockType = world.getBlockType(pos.getX(), pos.getY(), pos.getZ());
+            BlockType blockType = world.getBlockType(x, y, z);
             if (blockType != null) {
-                world.setBlockInteractionState(pos, blockType, state);
+                world.setBlockInteractionState(new Vector3i(x, y, z), blockType, state);
             }
         } catch (Throwable t) {
             LOGGER.at(Level.WARNING).withCause(t).log("Failed to set block interaction state: " + state);

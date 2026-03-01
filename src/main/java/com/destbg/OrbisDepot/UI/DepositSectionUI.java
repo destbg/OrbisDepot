@@ -1,9 +1,9 @@
 package com.destbg.OrbisDepot.UI;
 
-import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
+import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -17,41 +17,14 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-import java.util.UUID;
-
-final class DepositSectionUI {
+public class DepositSectionUI {
 
     private final OrbisDepotStorageContext context;
-    private volatile boolean lastDepositHasItems = false;
-    private volatile UUID targetOwnerOverride;
-
-    DepositSectionUI(OrbisDepotStorageContext context) {
+    public DepositSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
     }
 
-    void setTargetOwner(UUID ownerUUID) {
-        this.targetOwnerOverride = ownerUUID;
-    }
-
-    private UUID getEffectiveOwner() {
-        UUID override = targetOwnerOverride;
-        return override != null ? override : context.getOwnerUUID();
-    }
-
-    boolean hasDepositStateChanged() {
-        ItemContainer depositSlots = context.getUploadSlotContainer();
-        boolean depositHasItems = false;
-        for (short i = 0; i < depositSlots.getCapacity(); i++) {
-            ItemStack stack = depositSlots.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                depositHasItems = true;
-                break;
-            }
-        }
-        return depositHasItems != lastDepositHasItems;
-    }
-
-    void build(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
+    public void build(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
         ItemContainer depositSlots = context.getUploadSlotContainer();
         int slotCount = context.getDepositSlotCount();
 
@@ -72,34 +45,15 @@ final class DepositSectionUI {
                         cmd.set(sel + " #QuantityLabel.Text", String.valueOf(stack.getQuantity()));
                     }
 
-                    evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton",
-                            EventData.of(Constants.KEY_ACTION, "cancel-upload:" + i));
+                    evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "cancel-upload:" + i));
                 }
             }
         }
 
-        lastDepositHasItems = hasItems;
         applyProgressStatus(cmd, hasItems);
     }
 
-    void update(@NonNullDecl UICommandBuilder cmd) {
-        ItemContainer depositSlots = context.getUploadSlotContainer();
-        int slotCount = context.getDepositSlotCount();
-        boolean hasItems = false;
-
-        for (short i = 0; i < Math.min(slotCount, depositSlots.getCapacity()); i++) {
-            ItemStack stack = depositSlots.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                hasItems = true;
-                String sel = "#DepositSlots[" + i + "]";
-                cmd.set(sel + " #QuantityLabel.Text", stack.getQuantity() > 1 ? String.valueOf(stack.getQuantity()) : "");
-            }
-        }
-
-        applyProgressStatus(cmd, hasItems);
-    }
-
-    void handleDeposit(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String slotStr, ItemTransferUtil transferUtil) {
+    public void handleDeposit(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String slotStr) {
         int slotIndex;
         try {
             slotIndex = Integer.parseInt(slotStr);
@@ -160,13 +114,13 @@ final class DepositSectionUI {
 
         if (existingInSlot != null && !ItemStack.isEmpty(existingInSlot)) {
             if (!existingInSlot.getItemId().equals(clickedStack.getItemId())) {
-                transferUtil.giveToPlayer(playerInv, existingInSlot.getItemId(), existingInSlot.getQuantity());
+                InventoryUtils.giveToPlayer(playerInv, existingInSlot, existingInSlot.getQuantity(), context.getAdditionalStacks());
                 depositSlots.removeItemStackFromSlot(targetSlot);
                 existingInSlot = null;
             }
         }
 
-        int maxStack = DepositUtils.getMaxStack(clickedStack);
+        int maxStack = DepositUtils.getMaxStack(clickedStack.getItem(), 1, context.getAdditionalStacks());
         int currentInSlot = (existingInSlot != null && !ItemStack.isEmpty(existingInSlot)) ? existingInSlot.getQuantity() : 0;
         int spaceInSlot = maxStack - currentInSlot;
         int toDeposit = Math.min(clickedStack.getQuantity(), spaceInSlot);
@@ -191,8 +145,7 @@ final class DepositSectionUI {
         context.resetUploadTimer();
     }
 
-    void handleCancelUpload(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store,
-                            String slotStr, ItemTransferUtil transferUtil) {
+    public void handleCancelUpload(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String slotStr) {
         int depositSlotIndex;
         try {
             depositSlotIndex = Integer.parseInt(slotStr);
@@ -225,7 +178,7 @@ final class DepositSectionUI {
             return;
         }
 
-        int given = transferUtil.giveToPlayer(playerInv, stack.getItemId(), stack.getQuantity());
+        int given = InventoryUtils.giveToPlayer(playerInv, stack, stack.getQuantity(), context.getAdditionalStacks());
         if (given > 0) {
             int remaining = stack.getQuantity() - given;
             if (remaining <= 0) {
@@ -238,6 +191,20 @@ final class DepositSectionUI {
         context.resetUploadTimer();
     }
 
+    private void applyProgressStatus(@NonNullDecl UICommandBuilder cmd, boolean hasItems) {
+        String statusText;
+        if (hasItems && hasNonStackableInSlots()) {
+            statusText = "Can't deposit non-stackable items";
+        } else if (!hasItems) {
+            statusText = "Place items";
+        } else {
+            float tickInterval = context.getTickIntervalSeconds();
+            int itemsPerMin = (int) Math.round(60.0 / tickInterval);
+            statusText = "Depositing " + itemsPerMin + " items/slot/min";
+        }
+        cmd.set("#DepositStatusLabel.Text", statusText);
+    }
+
     private boolean hasNonStackableInSlots() {
         ItemContainer depositSlots = context.getUploadSlotContainer();
         for (short i = 0; i < depositSlots.getCapacity(); i++) {
@@ -247,45 +214,5 @@ final class DepositSectionUI {
             }
         }
         return false;
-    }
-
-    private boolean isDepositSlotAtCapacity() {
-        UUID owner = getEffectiveOwner();
-        if (owner == null) {
-            return false;
-        }
-        ItemContainer depositSlots = context.getUploadSlotContainer();
-        int stackMultiplier = context.getStackMultiplier();
-        for (short i = 0; i < Math.min(context.getDepositSlotCount(), depositSlots.getCapacity()); i++) {
-            ItemStack stack = depositSlots.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                long maxForItem = (long) DepositUtils.getMaxStack(stack) * stackMultiplier;
-                long inStorage = VoidStorageManager.get().getItemCount(owner, stack.getItemId());
-                if (inStorage < maxForItem) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private void applyProgressStatus(@NonNullDecl UICommandBuilder cmd, boolean hasItems) {
-        String statusText;
-        float progress;
-        if (hasItems && hasNonStackableInSlots()) {
-            statusText = "Can't Deposit non-stackable items";
-            progress = 0f;
-        } else if (!hasItems) {
-            statusText = "Place items";
-            progress = 0f;
-        } else if (isDepositSlotAtCapacity()) {
-            statusText = "Storage full";
-            progress = 0f;
-        } else {
-            statusText = "Depositing...";
-            progress = context.getUploadProgress();
-        }
-        cmd.set("#UploadProgressBar.Value", progress);
-        cmd.set("#DepositStatusLabel.Text", statusText);
     }
 }

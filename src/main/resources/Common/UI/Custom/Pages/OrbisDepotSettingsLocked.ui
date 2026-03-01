@@ -1,7 +1,6 @@
 $C = "../Common.ui";
 
 Group {
-  Anchor: (Full: 0);
   LayoutMode: Top;
 
   Group {
@@ -43,9 +42,5 @@ Group {
       Style: (FontSize: 12, TextColor: #96a9be, Wrap: true);
       Anchor: (Width: 256);
     }
-  }
-
-  Group {
-    FlexWeight: 1;
   }
 }

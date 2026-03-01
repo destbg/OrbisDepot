@@ -1,52 +1,45 @@
 package com.destbg.OrbisDepot.Utils;
 
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 
 public final class DepositUtils {
+    public static void attemptDeposit(@Nonnull ItemContainer itemContainer, @Nonnull DepotStorageData storage, int rank, short additionalStacks) {
+        for (short slot = 0; slot < itemContainer.getCapacity(); slot++) {
+            ItemStack stack = itemContainer.getItemStack(slot);
+            if (stack == null || ItemStack.isEmpty(stack)) {
+                continue;
+            }
 
-    private DepositUtils() {
-    }
+            if (DepositUtils.isDepositEligible(stack)) {
+                continue;
+            }
 
-    public static boolean processSlot(@Nonnull ItemContainer container, short slot, @Nonnull UUID ownerUUID, int stackMultiplier) {
-        if (slot < 0 || slot >= container.getCapacity()) {
-            return true;
+            String itemId = stack.getItemId();
+            int maxForItem = DepositUtils.getMaxStack(stack.getItem(), rank, additionalStacks);
+            long currentForItem = storage.getItemCount(itemId);
+            if (currentForItem >= maxForItem) {
+                continue;
+            }
+
+            if (storage.isStorageFull()) {
+                continue;
+            }
+
+            int qty = stack.getQuantity();
+
+            if (qty <= 1) {
+                itemContainer.removeItemStackFromSlot(slot);
+            } else {
+                itemContainer.setItemStackForSlot(slot, stack.withQuantity(qty - 1));
+            }
+
+            storage.addItem(itemId, 1);
         }
-
-        ItemStack stack = container.getItemStack(slot);
-        if (stack == null || ItemStack.isEmpty(stack)) {
-            return true;
-        }
-
-        if (isDepositEligible(stack)) {
-            return true;
-        }
-
-        String itemId = stack.getItemId();
-        int maxForItem = getMaxStack(stack) * stackMultiplier;
-        long currentForItem = VoidStorageManager.get().getItemCount(ownerUUID, itemId);
-        if (currentForItem >= maxForItem) {
-            return false;
-        }
-
-        int qty = stack.getQuantity();
-
-        if (qty <= 1) {
-            container.removeItemStackFromSlot(slot);
-        } else {
-            container.setItemStackForSlot(slot, stack.withQuantity(qty - 1));
-        }
-
-        VoidStorageManager.get().addItems(ownerUUID, itemId, 1);
-        notifyStorageChanged(ownerUUID);
-        return false;
     }
 
     public static boolean isDepositEligible(@Nonnull ItemStack stack) {
@@ -57,22 +50,20 @@ public final class DepositUtils {
         return item.getMaxStack() <= 1;
     }
 
-    public static int getMaxStack(@Nonnull ItemStack stack) {
-        Item item = stack.getItem();
-        return item.getMaxStack();
+    public static int getMaxStack(@Nonnull Item item, int rank, short additionalStacks) {
+        int stackCount = item.getMaxStack();
+        int rankMultiplier = Constants.STORAGE_RANK_MULTIPLIERS[Math.min(rank - 1, Constants.STORAGE_RANK_MULTIPLIERS.length - 1)];
+        return (stackCount * rankMultiplier) + (stackCount * additionalStacks);
     }
 
-    public static int getMaxStack(@Nonnull String itemId) {
-        return getMaxStack(new ItemStack(itemId, 1));
-    }
-
-    private static void notifyStorageChanged(@Nonnull UUID ownerUUID) {
-        try {
-            World world = Universe.get().getDefaultWorld();
-            if (world != null) {
-                CraftingUtils.onStorageChanged(ownerUUID, world);
-            }
-        } catch (Exception ignored) {
+    public static int getMaxStack(@Nonnull String itemId, int rank, short additionalStacks) {
+        Item itemAsset = Constants.ITEM_ASSET_MAP.getAsset(itemId);
+        if (itemAsset == null) {
+            return 1;
         }
+
+        int stackCount = itemAsset.getMaxStack();
+        int rankMultiplier = Constants.STORAGE_RANK_MULTIPLIERS[Math.min(rank - 1, Constants.STORAGE_RANK_MULTIPLIERS.length - 1)];
+        return (stackCount * rankMultiplier) + (stackCount * additionalStacks);
     }
 }

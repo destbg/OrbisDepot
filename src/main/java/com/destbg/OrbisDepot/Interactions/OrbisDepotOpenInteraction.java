@@ -1,13 +1,13 @@
 package com.destbg.OrbisDepot.Interactions;
 
-import com.destbg.OrbisDepot.Main;
-import com.destbg.OrbisDepot.State.OrbisDepotBlockState;
-import com.destbg.OrbisDepot.Storage.AttunementManager;
-import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
+import com.destbg.OrbisDepot.Components.DepotChunkData;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Models.OrbisDepotStorageModel;
+import com.destbg.OrbisDepot.Storage.DepotStorageManager;
+import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.BlockStateUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
-import com.destbg.OrbisDepot.Utils.DepotSlotUtils;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -16,10 +16,10 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -35,32 +35,24 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class OpenOrbisDepotInteraction extends SimpleInstantInteraction {
+public class OrbisDepotOpenInteraction extends SimpleInstantInteraction {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenOrbisDepotInteraction> CODEC = BuilderCodec.builder(
-            OpenOrbisDepotInteraction.class, OpenOrbisDepotInteraction::new, SimpleInstantInteraction.CODEC
+    public static final BuilderCodec<OrbisDepotOpenInteraction> CODEC = BuilderCodec.builder(
+            OrbisDepotOpenInteraction.class, OrbisDepotOpenInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
     @Override
     protected void firstRun(@NonNullDecl InteractionType interactionType, @NonNullDecl InteractionContext interactionContext, @NonNullDecl CooldownHandler cooldownHandler) {
-        if (!Main.isInitialized()) {
-            LOGGER.at(Level.WARNING).log("Plugin not initialized, cannot open Depot UI");
-            interactionContext.getState().state = InteractionState.Failed;
-            return;
-        }
-
         CommandBuffer<EntityStore> commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
-        World world = commandBuffer.getExternalData().getWorld();
         Store<EntityStore> store = commandBuffer.getExternalData().getStore();
         Ref<EntityStore> ref = interactionContext.getEntity();
-
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
         if (player == null) {
             interactionContext.getState().state = InteractionState.Failed;
@@ -73,7 +65,7 @@ public class OpenOrbisDepotInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        if (!PermissionsModule.get().hasPermission(playerRef.getUuid(), Constants.PERM_DEPOT_USE)) {
+        if (!PermissionsModule.get().hasPermission(playerRef.getUuid(), Constants.PERM_SIGIL_USE)) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -84,43 +76,51 @@ public class OpenOrbisDepotInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        Vector3i pos = new Vector3i(targetBlock.x, targetBlock.y, targetBlock.z);
-        if (Main.getOrbisDepotComponentType() == null) {
-            LOGGER.at(Level.SEVERE).log("orbisDepotComponentType is null at pos %d,%d,%d", pos.getX(), pos.getY(), pos.getZ());
-            interactionContext.getState().state = InteractionState.Failed;
-            return;
-        }
-        Holder<ChunkStore> holder = world.getBlockComponentHolder(pos.getX(), pos.getY(), pos.getZ());
-        OrbisDepotBlockState depotState = holder != null
-                ? holder.getComponent(Main.getOrbisDepotComponentType())
-                : null;
-        if (depotState == null) {
-            LOGGER.at(Level.WARNING).log("No block state found at pos %d,%d,%d (holder=%s)", pos.getX(), pos.getY(), pos.getZ(), holder);
+        World world = commandBuffer.getExternalData().getWorld();
+        Holder<ChunkStore> holder = world.getBlockComponentHolder(targetBlock.x, targetBlock.y, targetBlock.z);
+        if (holder == null) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
-        String posKey = DepotSlotUtils.posKey(pos.getX(), pos.getY(), pos.getZ());
-        depotState.setPositionKey(posKey);
-
-        if (depotState.getOwnerUUID() == null) {
-            depotState.setOwner(playerRef.getUuid());
-        } else if (!depotState.isOwner(playerRef.getUuid())
-                && !AttunementManager.get().isAttunedTo(playerRef.getUuid(), depotState.getOwnerUUID())) {
-            player.sendMessage(Message.raw("You are not the owner of this Orbis Depot.").color("#ff6b6b"));
+        DepotChunkData depotChunkData = holder.getComponent(DepotChunkData.getComponentType());
+        if (depotChunkData == null) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
-        UUID depotOwner = depotState.getOwnerUUID();
-        DepotSlotUtils.registerDepot(posKey, depotOwner);
+        UUID ownerUUID = depotChunkData.getOwnerUUID();
+        if (ownerUUID == null) {
+            String posKey = targetBlock.x + ":" + targetBlock.y + ":" + targetBlock.z;
+            ownerUUID = LegacySlotMigration.readLegacyDepotOwner(posKey);
+            if (ownerUUID == null) {
+                interactionContext.getState().state = InteractionState.Failed;
+                return;
+            }
+            depotChunkData.setOwnerUUID(ownerUUID);
+            LegacySlotMigration.migrateDepotSlots(posKey, depotChunkData.getItemContainer());
+        }
 
-        BlockStateUtils.setBlockInteractionState("OpenWindow", world, pos);
-        SoundUtils.playSFX("SFX_Chest_Wooden_Open", pos.getX(), pos.getY(), pos.getZ(), store);
+        boolean isOwner = playerRef.getUuid().equals(ownerUUID);
+        DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
+        boolean isAttuned = myStorage.isAttunedTo(ownerUUID);
+        if (!isOwner && !isAttuned) {
+            player.sendMessage(Message.raw("You are not attuned to this Orbis Depot.").color("#ff6b6b"));
+            interactionContext.getState().state = InteractionState.Failed;
+            return;
+        }
 
-        OrbisDepotStorageContext context = new OrbisDepotStorageContext.Depot(posKey, depotOwner, world);
+        DepotStorageData ownerStorage = DepotStorageManager.get().getOrCreate(ownerUUID);
+
+        BlockStateUtils.setBlockInteractionState("OpenWindow", world, targetBlock.x, targetBlock.y, targetBlock.z);
+        SoundUtils.playSFX("SFX_Chest_Wooden_Open", targetBlock.x, targetBlock.y, targetBlock.z, store);
+
+        final DepotStorageData finalOwnerStorage = ownerStorage;
+        final DepotStorageData finalMyStorage = myStorage;
         CompletableFuture.runAsync(() -> {
             try {
+                Vector3i location = new Vector3i(targetBlock.x, targetBlock.y, targetBlock.z);
+                OrbisDepotStorageModel context = new OrbisDepotStorageModel(world, depotChunkData, finalOwnerStorage, finalMyStorage, location);
                 Player p = store.getComponent(ref, Player.getComponentType());
                 if (p != null) {
                     p.getPageManager().openCustomPage(ref, store, new OrbisDepotStorageUI(playerRef, context));

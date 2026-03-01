@@ -11,6 +11,39 @@ public final class InventoryUtils {
     private InventoryUtils() {
     }
 
+    public static int giveToPlayer(ItemContainer playerInv, String itemId, int toGive, short additionalStacks) {
+        int given = 0;
+        short cap = playerInv.getCapacity();
+        int maxStack = DepositUtils.getMaxStack(itemId, 1, additionalStacks);
+
+        for (short i = 0; i < cap && toGive > 0; i++) {
+            ItemStack existing = playerInv.getItemStack(i);
+            if (existing != null && !ItemStack.isEmpty(existing) && existing.getItemId().equals(itemId) && existing.getQuantity() < maxStack) {
+                int space = maxStack - existing.getQuantity();
+                int add = Math.min(toGive, space);
+                playerInv.setItemStackForSlot(i, existing.withQuantity(existing.getQuantity() + add));
+                given += add;
+                toGive -= add;
+            }
+        }
+
+        for (short i = 0; i < cap && toGive > 0; i++) {
+            ItemStack existing = playerInv.getItemStack(i);
+            if (existing == null || ItemStack.isEmpty(existing)) {
+                int add = Math.min(toGive, maxStack);
+                playerInv.setItemStackForSlot(i, new ItemStack(itemId, add));
+                given += add;
+                toGive -= add;
+            }
+        }
+
+        return given;
+    }
+
+    public static int giveToPlayer(ItemContainer playerInv, ItemStack itemStack, int toGive, short additionalStacks) {
+        return giveToPlayer(playerInv, itemStack.getItemId(), toGive, additionalStacks);
+    }
+
     public static boolean hasOrbisSigil(@Nullable Inventory inv) {
         if (inv == null) {
             return false;
@@ -35,8 +68,8 @@ public final class InventoryUtils {
         return false;
     }
 
-    public static void addToActiveSlot(ItemContainer hotbar, byte activeSlot, String itemId) {
-        int maxStack = DepositUtils.getMaxStack(itemId);
+    public static void addToActiveSlot(ItemContainer hotbar, byte activeSlot, String itemId, short additionalStacks) {
+        int maxStack = DepositUtils.getMaxStack(itemId, 1, additionalStacks);
 
         if (activeSlot >= 0 && activeSlot < hotbar.getCapacity()) {
             ItemStack existing = hotbar.getItemStack(activeSlot);

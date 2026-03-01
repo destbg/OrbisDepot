@@ -1,12 +1,12 @@
 {
     "Parent": "Spellbook",
     "Animations": {
-        "CastHurlCharging": {
+        "CastSigilOpen": {
             "ThirdPerson": "Characters/Custom/Orbis_Sigil_Open.blockyanim",
             "FirstPerson": "Characters/Custom/Orbis_Sigil_Open_FPS.blockyanim",
             "Speed": 1
         },
-        "CastHurlCharged": {
+        "CastSigilClose": {
             "ThirdPerson": "Characters/Custom/Orbis_Sigil_Close.blockyanim",
             "FirstPerson": "Characters/Custom/Orbis_Sigil_Close_FPS.blockyanim",
             "Speed": 1,

@@ -1,0 +1,9 @@
+Group {
+  LayoutMode: Center;
+  Anchor: (Height: 8);
+
+  Group #Line {
+    Anchor: (Width: 2, Height: 8);
+    Background: (Color: #4a5568);
+  }
+}

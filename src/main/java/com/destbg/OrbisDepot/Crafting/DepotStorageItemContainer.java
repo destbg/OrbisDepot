@@ -1,41 +1,39 @@
 package com.destbg.OrbisDepot.Crafting;
 
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Utils.CraftingUtils;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.UUID;
 
-public final class VoidStorageItemContainer extends SimpleItemContainer {
+public final class DepotStorageItemContainer extends SimpleItemContainer {
 
     private final UUID playerUUID;
+    private final DepotStorageData depotStorageData;
 
-    public VoidStorageItemContainer(@Nonnull UUID playerUUID) {
+    public DepotStorageItemContainer(@Nonnull UUID playerUUID, @Nonnull DepotStorageData depotStorageData) {
         super((short) 1);
         this.playerUUID = playerUUID;
+        this.depotStorageData = depotStorageData;
         refresh();
     }
 
     public void refresh() {
-        Map<String, Long> voidItems = VoidStorageManager.get().getItems(playerUUID);
+        Map<String, Integer> items = depotStorageData.getItemContainer();
 
         this.lock.writeLock().lock();
         try {
             this.items.clear();
-
             short slot = 0;
-            for (Map.Entry<String, Long> entry : voidItems.entrySet()) {
-                long qty = entry.getValue();
+            for (Map.Entry<String, Integer> entry : items.entrySet()) {
+                int qty = entry.getValue();
                 if (qty <= 0) {
                     continue;
                 }
-                int clampedQty = (int) Math.min(qty, Integer.MAX_VALUE);
-                this.items.put(slot, new ItemStack(entry.getKey(), clampedQty));
+                this.items.put(slot, new ItemStack(entry.getKey(), qty));
                 slot++;
             }
             this.capacity = slot;
@@ -55,8 +53,8 @@ public final class VoidStorageItemContainer extends SimpleItemContainer {
     protected ItemStack internal_removeSlot(short slot) {
         ItemStack previous = super.internal_removeSlot(slot);
         if (previous != null && !ItemStack.isEmpty(previous)) {
-            VoidStorageManager.get().removeItems(playerUUID, previous.getItemId(), previous.getQuantity());
-            notifyStorageChanged();
+            depotStorageData.removeItems(previous.getItemId(), previous.getQuantity());
+            CraftingUtils.onStorageChanged(playerUUID);
         }
         return previous;
     }
@@ -65,24 +63,12 @@ public final class VoidStorageItemContainer extends SimpleItemContainer {
         if (previous == null || ItemStack.isEmpty(previous)) {
             return;
         }
-
         int prevQty = previous.getQuantity();
         int curQty = (current != null && !ItemStack.isEmpty(current)) ? current.getQuantity() : 0;
         int removed = prevQty - curQty;
-
         if (removed > 0) {
-            VoidStorageManager.get().removeItems(playerUUID, previous.getItemId(), removed);
-            notifyStorageChanged();
-        }
-    }
-
-    private void notifyStorageChanged() {
-        try {
-            World world = Universe.get().getDefaultWorld();
-            if (world != null) {
-                CraftingUtils.onStorageChanged(playerUUID, world);
-            }
-        } catch (Exception ignored) {
+            depotStorageData.removeItems(previous.getItemId(), removed);
+            CraftingUtils.onStorageChanged(playerUUID);
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.destbg.OrbisDepot.Crafting;
 
 import com.destbg.OrbisDepot.Utils.CraftingUtils;
+import com.hypixel.hytale.builtin.crafting.window.FieldCraftingWindow;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.builtin.crafting.window.FieldCraftingWindow;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 

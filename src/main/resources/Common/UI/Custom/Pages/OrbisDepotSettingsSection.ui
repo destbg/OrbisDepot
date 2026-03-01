@@ -1,7 +1,6 @@
 $C = "../Common.ui";
 
 Group {
-  Anchor: (Full: 0);
   LayoutMode: Top;
 
   Group {
@@ -25,9 +24,14 @@ Group {
       @Text = "Crafting integration";
       @Checked = true;
     }
-  }
 
-  Group {
-    FlexWeight: 1;
+    Group {
+      Anchor: (Height: 6);
+    }
+
+    $C.@CheckBoxWithLabel #ThrottleUiToggle {
+      @Text = "Throttle UI updates (1/s)";
+      @Checked = false;
+    }
   }
 }

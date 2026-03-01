@@ -1,0 +1,17 @@
+Group {
+  LayoutMode: Top;
+
+  Button #UpgradeOpenBtn {
+    Anchor: (Height: 28, Left: 16, Right: 16);
+    Style: (Default: (Background: #2b3542), Hovered: (Background: #2b3542), Pressed: (Background: #2b3542));
+
+    Label {
+      Text: "Upgrade Storage";
+      Style: (FontSize: 13, TextColor: #5a6a7a, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+  }
+
+  Group {
+    Anchor: (Height: 8);
+  }
+}

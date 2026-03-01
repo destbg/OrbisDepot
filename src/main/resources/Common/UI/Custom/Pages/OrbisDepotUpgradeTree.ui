@@ -1,0 +1,55 @@
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 18);
+
+    Group {
+      FlexWeight: 1;
+
+      Label {
+        Text: "STORAGE";
+        Style: (FontSize: 10, TextColor: #96a9be, RenderUppercase: true, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+        Anchor: (Full: 0);
+      }
+    }
+
+    Group {
+      FlexWeight: 1;
+
+      Label {
+        Text: "SPEED";
+        Style: (FontSize: 10, TextColor: #96a9be, RenderUppercase: true, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+        Anchor: (Full: 0);
+      }
+    }
+  }
+
+  Group {
+    Anchor: (Height: 2);
+  }
+
+  Group {
+    LayoutMode: Left;
+
+    Group #StorageColumn {
+      FlexWeight: 1;
+      LayoutMode: Top;
+
+      Group #StorageSlots {
+        LayoutMode: Top;
+      }
+    }
+
+    Group #SpeedColumn {
+      FlexWeight: 1;
+      LayoutMode: Top;
+
+      Group #SpeedSlots {
+        LayoutMode: Top;
+      }
+    }
+  }
+}

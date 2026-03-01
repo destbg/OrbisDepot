@@ -1,0 +1,11 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.OrbisUpgradeStorage4.name",
+    "Description": "server.items.OrbisUpgradeStorage4.description"
+  },
+  "Categories": ["Items.Orbis_Depot"],
+  "Quality": "Legendary",
+  "ItemLevel": 1,
+  "MaxStack": 1,
+  "Icon": "Icons/ItemsGenerated/UpgradeStorage.png"
+}

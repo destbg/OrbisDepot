@@ -1,8 +1,9 @@
 package com.destbg.OrbisDepot.Utils;
 
-import com.destbg.OrbisDepot.Crafting.VoidStorageItemContainer;
-import com.destbg.OrbisDepot.Storage.PlayerSettingsManager;
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Components.SigilPlayerData;
+import com.destbg.OrbisDepot.Crafting.DepotStorageItemContainer;
+import com.destbg.OrbisDepot.Storage.DepotStorageManager;
 import com.google.gson.JsonObject;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -22,6 +23,7 @@ import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.io.PacketHandler;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
@@ -33,10 +35,7 @@ import java.util.logging.Level;
 public final class CraftingUtils {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-    private static final Map<UUID, VoidStorageItemContainer> voidContainers = new ConcurrentHashMap<>();
-
-    private CraftingUtils() {
-    }
+    private static final Map<UUID, DepotStorageItemContainer> depotContainers = new ConcurrentHashMap<>();
 
     public static void injectForPlayer(Ref<EntityStore> ref, Store<EntityStore> store, Window triggeringWindow) {
         try {
@@ -46,7 +45,9 @@ public final class CraftingUtils {
             }
 
             UUID uuid = playerRef.getUuid();
-            if (!PlayerSettingsManager.get().isCraftingIntegrationEnabled(uuid)) {
+
+            SigilPlayerData sigilData = store.getComponent(ref, SigilPlayerData.getComponentType());
+            if (sigilData == null || !sigilData.setCraftingIntegration()) {
                 return;
             }
 
@@ -55,30 +56,31 @@ public final class CraftingUtils {
                 return;
             }
 
-            Map<String, Long> voidItems = VoidStorageManager.get().getItems(uuid);
-            if (voidItems.isEmpty()) {
+            DepotStorageData depotStorage = DepotStorageManager.get().get(uuid);
+            if (depotStorage == null || depotStorage.getItemContainer().isEmpty()) {
                 return;
             }
 
             PacketHandler packetHandler = playerRef.getPacketHandler();
-            VoidStorageItemContainer voidContainer = voidContainers.computeIfAbsent(uuid, VoidStorageItemContainer::new);
-            voidContainer.refresh();
-            if (voidContainer.getCapacity() == 0) {
+            DepotStorageItemContainer depotContainer = depotContainers.computeIfAbsent(uuid,
+                    u -> new DepotStorageItemContainer(u, depotStorage));
+            depotContainer.refresh();
+            if (depotContainer.getCapacity() == 0) {
                 return;
             }
 
-            ItemQuantity[] voidQuantities = buildItemQuantities(voidContainer);
-            if (voidQuantities.length == 0) {
+            ItemQuantity[] depotQuantities = buildItemQuantities(depotContainer);
+            if (depotQuantities.length == 0) {
                 return;
             }
 
             if (triggeringWindow instanceof MaterialContainerWindow mcw) {
-                injectBenchVoidStorage(mcw, triggeringWindow, packetHandler, voidContainer);
+                injectBenchDepotStorage(mcw, triggeringWindow, packetHandler, depotContainer);
             } else if (triggeringWindow instanceof FieldCraftingWindow) {
-                sendFieldCraftingExtraResources(triggeringWindow, packetHandler, voidQuantities);
+                sendFieldCraftingExtraResources(triggeringWindow, packetHandler, depotQuantities);
             }
         } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error injecting void storage for player");
+            LOGGER.at(Level.SEVERE).withCause(e).log("Error injecting depot storage for player");
         }
     }
 
@@ -91,42 +93,41 @@ public final class CraftingUtils {
                 }
 
                 UUID uuid = playerRef.getUuid();
-                if (!PlayerSettingsManager.get().isCraftingIntegrationEnabled(uuid)) {
+
+                SigilPlayerData sigilData = store.getComponent(ref, SigilPlayerData.getComponentType());
+                if (sigilData == null || !sigilData.setCraftingIntegration()) {
                     return;
                 }
 
                 Player player = store.getComponent(ref, Player.getComponentType());
-                if (player == null) {
+                if (player == null || !InventoryUtils.hasOrbisSigil(player.getInventory())) {
                     return;
                 }
 
-                if (!InventoryUtils.hasOrbisSigil(player.getInventory())) {
-                    return;
-                }
-
-                Map<String, Long> voidItems = VoidStorageManager.get().getItems(uuid);
-                if (voidItems.isEmpty()) {
+                DepotStorageData depotStorage = DepotStorageManager.get().get(uuid);
+                if (depotStorage == null || depotStorage.getItemContainer().isEmpty()) {
                     return;
                 }
 
                 PacketHandler packetHandler = playerRef.getPacketHandler();
-                VoidStorageItemContainer voidContainer = voidContainers.computeIfAbsent(uuid, VoidStorageItemContainer::new);
-                voidContainer.refresh();
-                if (voidContainer.getCapacity() == 0) {
+                DepotStorageItemContainer depotContainer = depotContainers.computeIfAbsent(uuid,
+                        u -> new DepotStorageItemContainer(u, depotStorage));
+                depotContainer.refresh();
+                if (depotContainer.getCapacity() == 0) {
                     return;
                 }
 
-                ItemQuantity[] voidQuantities = buildItemQuantities(voidContainer);
-                if (voidQuantities.length == 0) {
+                ItemQuantity[] depotQuantities = buildItemQuantities(depotContainer);
+                if (depotQuantities.length == 0) {
                     return;
                 }
 
                 List<Window> windows = player.getWindowManager().getWindows();
                 for (Window window : windows) {
                     if (window instanceof MaterialContainerWindow mcw) {
-                        injectBenchVoidStorage(mcw, window, packetHandler, voidContainer);
+                        injectBenchDepotStorage(mcw, window, packetHandler, depotContainer);
                     } else if (window instanceof FieldCraftingWindow) {
-                        sendFieldCraftingExtraResources(window, packetHandler, voidQuantities);
+                        sendFieldCraftingExtraResources(window, packetHandler, depotQuantities);
                     }
                 }
             } catch (Exception e) {
@@ -135,20 +136,20 @@ public final class CraftingUtils {
         }, world);
     }
 
-    public static void onStorageChanged(UUID playerUUID, World world) {
+    public static void onStorageChanged(UUID playerUUID) {
+        World world;
+        try {
+            world = Universe.get().getDefaultWorld();
+        } catch (Exception e) {
+            return;
+        }
+        if (world == null) {
+            return;
+        }
+
         CompletableFuture.runAsync(() -> {
             try {
-                if (!PlayerSettingsManager.get().isCraftingIntegrationEnabled(playerUUID)) {
-                    return;
-                }
-
-                PlayerRef playerRef = null;
-                for (PlayerRef pr : world.getPlayerRefs()) {
-                    if (pr.getUuid().equals(playerUUID)) {
-                        playerRef = pr;
-                        break;
-                    }
-                }
+                PlayerRef playerRef = Universe.get().getPlayer(playerUUID);
                 if (playerRef == null) {
                     return;
                 }
@@ -158,33 +159,41 @@ public final class CraftingUtils {
                     return;
                 }
 
-                Store<EntityStore> playerEntityStore = playerEntity.getStore();
-                Player player = playerEntityStore.getComponent(playerEntity, Player.getComponentType());
-                if (player == null) {
+                Store<EntityStore> playerStore = playerEntity.getStore();
+
+                SigilPlayerData sigilData = playerStore.getComponent(playerEntity, SigilPlayerData.getComponentType());
+                if (sigilData == null || !sigilData.setCraftingIntegration()) {
                     return;
                 }
 
-                if (!InventoryUtils.hasOrbisSigil(player.getInventory())) {
+                Player player = playerStore.getComponent(playerEntity, Player.getComponentType());
+                if (player == null || !InventoryUtils.hasOrbisSigil(player.getInventory())) {
+                    return;
+                }
+
+                DepotStorageData depotStorage = DepotStorageManager.get().get(playerUUID);
+                if (depotStorage == null) {
                     return;
                 }
 
                 PacketHandler packetHandler = playerRef.getPacketHandler();
-                VoidStorageItemContainer voidContainer = voidContainers.computeIfAbsent(playerUUID, VoidStorageItemContainer::new);
-                voidContainer.refresh();
+                DepotStorageItemContainer depotContainer = depotContainers.computeIfAbsent(playerUUID,
+                        u -> new DepotStorageItemContainer(u, depotStorage));
+                depotContainer.refresh();
 
-                ItemQuantity[] voidQuantities = (voidContainer.getCapacity() > 0)
-                        ? buildItemQuantities(voidContainer)
+                ItemQuantity[] depotQuantities = depotContainer.getCapacity() > 0
+                        ? buildItemQuantities(depotContainer)
                         : new ItemQuantity[0];
 
                 List<Window> windows = player.getWindowManager().getWindows();
                 for (Window window : windows) {
-                    if (voidQuantities.length == 0) {
+                    if (depotQuantities.length == 0) {
                         break;
                     }
                     if (window instanceof MaterialContainerWindow mcw) {
-                        injectBenchVoidStorage(mcw, window, packetHandler, voidContainer);
+                        injectBenchDepotStorage(mcw, window, packetHandler, depotContainer);
                     } else if (window instanceof FieldCraftingWindow) {
-                        sendFieldCraftingExtraResources(window, packetHandler, voidQuantities);
+                        sendFieldCraftingExtraResources(window, packetHandler, depotQuantities);
                     }
                 }
             } catch (Exception e) {
@@ -193,28 +202,23 @@ public final class CraftingUtils {
         }, world);
     }
 
-    public static void cleanup() {
-        voidContainers.clear();
-    }
-
-    private static void injectBenchVoidStorage(MaterialContainerWindow mcw, Window window,
-                                               PacketHandler packetHandler, VoidStorageItemContainer voidContainer) {
+    private static void injectBenchDepotStorage(MaterialContainerWindow mcw, Window window, PacketHandler packetHandler, DepotStorageItemContainer depotContainer) {
         MaterialExtraResourcesSection section = mcw.getExtraResourcesSection();
         ItemContainer existingContainer = section.getItemContainer();
 
         boolean alreadyInjected = false;
         if (existingContainer instanceof CombinedItemContainer combined) {
-            alreadyInjected = combined.containsContainer(voidContainer);
-        } else if (existingContainer == voidContainer) {
+            alreadyInjected = combined.containsContainer(depotContainer);
+        } else if (existingContainer == depotContainer) {
             alreadyInjected = true;
         }
 
         if (!alreadyInjected) {
             ItemContainer combinedContainer;
             if (existingContainer != null) {
-                combinedContainer = new CombinedItemContainer(existingContainer, voidContainer);
+                combinedContainer = new CombinedItemContainer(existingContainer, depotContainer);
             } else {
-                combinedContainer = voidContainer;
+                combinedContainer = depotContainer;
             }
             section.setItemContainer(combinedContainer);
         }
@@ -227,9 +231,8 @@ public final class CraftingUtils {
         packetHandler.write(packet);
     }
 
-    private static void sendFieldCraftingExtraResources(Window window, PacketHandler packetHandler,
-                                                        ItemQuantity[] voidQuantities) {
-        UpdateWindow packet = buildUpdatePacket(window, voidQuantities);
+    private static void sendFieldCraftingExtraResources(Window window, PacketHandler packetHandler, ItemQuantity[] depotQuantities) {
+        UpdateWindow packet = buildUpdatePacket(window, depotQuantities);
         packetHandler.write(packet);
     }
 

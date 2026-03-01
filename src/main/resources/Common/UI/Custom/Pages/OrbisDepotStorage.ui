@@ -50,7 +50,7 @@ Group {
             Anchor: (Full: 0);
 
             $C.@Title #TitleText {
-              @Text = "ORBIS DEPOT";
+              @Text = "ORBIS SIGIL";
               @Alignment = Start;
             }
 
@@ -77,12 +77,35 @@ Group {
         }
       }
 
-      Group #RightSpacer {
+      Group #SettingsSpacer {
         Anchor: (Width: 8);
       }
 
-      Group #RightSpacerPanel {
+      Group #SettingsPlaceholder {
         Anchor: (Width: 280);
+      }
+
+      $C.@DecoratedContainer #SettingsContainer {
+        Anchor: (Width: 280, Height: 360);
+
+        #Title {
+          $C.@Title #SettingsTitle {
+            @Text = "SETTINGS";
+          }
+        }
+
+        #Content {
+          LayoutMode: Top;
+
+          Group #SettingsPanel {
+            FlexWeight: 1;
+            LayoutMode: Top;
+          }
+
+          Group #UpgradeArea {
+            LayoutMode: Top;
+          }
+        }
       }
     }
   }

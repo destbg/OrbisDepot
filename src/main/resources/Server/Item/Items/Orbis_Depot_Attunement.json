@@ -14,12 +14,16 @@
     "TimeSeconds": 2,
     "Input": [
       {
-        "ItemId": "Ingredient_Void_Essence",
-        "Quantity": 4
+        "ItemId": "Ingredient_Fabric_Scrap_Cindercloth",
+        "Quantity": 40
       },
       {
-        "ItemId": "Ingredient_Bar_Gold",
-        "Quantity": 2
+        "ItemId": "Ingredient_Bar_Cobalt",
+        "Quantity": 8
+      },
+      {
+        "ItemId": "Ingredient_Leather_Heavy",
+        "Quantity": 24
       }
     ],
     "BenchRequirement": [
@@ -28,7 +32,8 @@
         "Type": "Crafting",
         "Categories": [
           "Workbench_Tinkering"
-        ]
+        ],
+        "RequiredTierLevel": 2
       }
     ]
   },
@@ -36,37 +41,44 @@
   "Model": "Items/Consumables/Recipes/Recipe.blockymodel",
   "Texture": "Items/Custom/Orbis_Depot_Attunement.png",
   "IconProperties": {
-    "Scale": 0.9,
+    "Scale": 1,
     "Rotation": [
-      22.5,
-      45,
-      22.5
+      33.92,
+      68.795,
+      40.67
     ],
     "Translation": [
-      0,
-      -8
+      -0.895,
+      -7
     ]
   },
   "Consumable": true,
   "Interactions": {
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "CheckUniqueItemUsage",
+          "Next": {
+            "Type": "IncreaseBackpackCapacity",
+            "Capacity": 9
+          }
+        }
+      ]
+    },
     "Secondary": {
       "Interactions": [
         {
           "Type": "Orbis_Depot_Attune"
         }
-      ],
-      "Settings": {
-        "Adventure": {},
-        "Creative": {}
-      }
+      ]
     }
   },
   "Tags": {
     "Family": [
-      "Temple"
+      "Backpack"
     ],
     "Type": [
-      "Consumable"
+      "Upgrade"
     ]
   }
 }

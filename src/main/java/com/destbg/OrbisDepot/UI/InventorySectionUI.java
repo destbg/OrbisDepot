@@ -14,48 +14,9 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-import java.util.Objects;
+public class InventorySectionUI {
 
-final class InventorySectionUI {
-
-    private String[] lastSnapshot;
-
-    boolean hasInventoryChanged(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return lastSnapshot != null;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return lastSnapshot != null;
-        }
-
-        ItemContainer combined = inv.getCombinedHotbarFirst();
-        if (combined == null) {
-            return lastSnapshot != null;
-        }
-
-        int slots = Math.clamp(combined.getCapacity(), 0, Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);
-        if (lastSnapshot == null || lastSnapshot.length != slots) {
-            return true;
-        }
-
-        for (int i = 0; i < slots; i++) {
-            ItemStack stack = combined.getItemStack((short) i);
-            String current = null;
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                current = stack.getItemId() + ":" + stack.getQuantity();
-            }
-            if (!Objects.equals(current, lastSnapshot[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void build(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl UICommandBuilder cmd,
-               @NonNullDecl UIEventBuilder evt, @NonNullDecl Store<EntityStore> store) {
+    public void build(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt, @NonNullDecl Store<EntityStore> store) {
         cmd.clear("#PlayerInventoryCards");
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null) {
@@ -94,22 +55,9 @@ final class InventorySectionUI {
                     }
                     String itemId = stack.getItemId();
                     if (!Constants.SIGIL_ITEM_ID.equals(itemId) && !Constants.CRUDE_SIGIL_ITEM_ID.equals(itemId)) {
-                        evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton",
-                                EventData.of(Constants.KEY_ACTION, "deposit:" + slotIndex));
+                        evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "deposit:" + slotIndex));
                     }
                 }
-            }
-        }
-
-        saveSnapshot(combined, displaySlots);
-    }
-
-    private void saveSnapshot(ItemContainer combined, int slots) {
-        lastSnapshot = new String[slots];
-        for (int i = 0; i < slots; i++) {
-            ItemStack stack = combined.getItemStack((short) i);
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                lastSnapshot[i] = stack.getItemId() + ":" + stack.getQuantity();
             }
         }
     }

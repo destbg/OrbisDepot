@@ -1,19 +1,22 @@
 package com.destbg.OrbisDepot.Interactions;
 
-import com.destbg.OrbisDepot.Main;
-import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Components.SigilPlayerData;
+import com.destbg.OrbisDepot.Models.OrbisSigilStorageModel;
+import com.destbg.OrbisDepot.Storage.DepotStorageManager;
+import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
-import com.hypixel.hytale.protocol.AnimationSlot;
-import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -27,21 +30,16 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class OpenOrbisSigilInteraction extends SimpleInstantInteraction {
+public class OrbisSigilOpenInteraction extends SimpleInstantInteraction {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenOrbisSigilInteraction> CODEC = BuilderCodec.builder(
-            OpenOrbisSigilInteraction.class, OpenOrbisSigilInteraction::new, SimpleInstantInteraction.CODEC
+    public static final BuilderCodec<OrbisSigilOpenInteraction> CODEC = BuilderCodec.builder(
+            OrbisSigilOpenInteraction.class, OrbisSigilOpenInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
     @Override
     protected void firstRun(@NonNullDecl InteractionType interactionType, @NonNullDecl InteractionContext interactionContext, @NonNullDecl CooldownHandler cooldownHandler) {
-        if (!Main.isInitialized()) {
-            interactionContext.getState().state = InteractionState.Failed;
-            return;
-        }
-
         CommandBuffer<EntityStore> commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
             interactionContext.getState().state = InteractionState.Failed;
@@ -68,9 +66,21 @@ public class OpenOrbisSigilInteraction extends SimpleInstantInteraction {
         }
 
         World world = commandBuffer.getExternalData().getWorld();
-        OrbisDepotStorageContext context = new OrbisDepotStorageContext.Sigil(playerRef, world);
+        SigilPlayerData sigilPlayerData = commandBuffer.getComponent(ref, SigilPlayerData.getComponentType());
+        if (sigilPlayerData == null) {
+            sigilPlayerData = new SigilPlayerData();
+            sigilPlayerData.setSelectedAttunement(playerRef.getUuid());
+            LegacySlotMigration.migrateSigilSlots(playerRef.getUuid(), sigilPlayerData.getItemContainer());
+            commandBuffer.putComponent(ref, SigilPlayerData.getComponentType(), sigilPlayerData);
+        }
+
+        DepotStorageData depotStorageData = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
+
+        final SigilPlayerData finalSigilPlayerData = sigilPlayerData;
+        final DepotStorageData finalDepotStorageData = depotStorageData;
         CompletableFuture.runAsync(() -> {
             try {
+                OrbisSigilStorageModel context = new OrbisSigilStorageModel(world, finalSigilPlayerData, finalDepotStorageData);
                 Player p = store.getComponent(ref, Player.getComponentType());
                 if (p != null) {
                     AnimationUtils.playAnimation(ref, AnimationSlot.Action,

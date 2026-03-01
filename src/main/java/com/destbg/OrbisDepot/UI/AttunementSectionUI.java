@@ -1,6 +1,8 @@
 package com.destbg.OrbisDepot.UI;
 
-import com.destbg.OrbisDepot.Storage.AttunementManager;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Models.AttunedEntry;
+import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -13,14 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-final class AttunementSectionUI {
+public class AttunementSectionUI {
 
+    private final OrbisDepotStorageContext context;
+    private final DepotStorageData depotStorage;
     private final UUID playerUUID;
     private final String playerName;
     private final boolean isOwnerView;
-    private final String contextKey;
     private UUID selectedOwnerUUID;
-    private List<AttunementManager.AttunedEntry> lastEntries;
 
     private enum ConfirmationType {REVOKE, LEAVE}
 
@@ -31,13 +33,14 @@ final class AttunementSectionUI {
     @Nullable
     private String pendingTargetName;
 
-    AttunementSectionUI(@Nonnull UUID playerUUID, @Nonnull String playerName, boolean isOwnerView, @Nonnull String contextKey) {
+    public AttunementSectionUI(OrbisDepotStorageContext context, @Nonnull UUID playerUUID, @Nonnull String playerName, boolean isOwnerView) {
+        this.context = context;
         this.playerUUID = playerUUID;
         this.playerName = playerName;
         this.isOwnerView = isOwnerView;
-        this.contextKey = contextKey;
+        this.depotStorage = context.getDepotStorageData();
 
-        UUID saved = AttunementManager.get().getSelectedTarget(contextKey);
+        UUID saved = context.getSavedAttunement();
         if (saved != null && isValidTarget(saved)) {
             this.selectedOwnerUUID = saved;
         } else {
@@ -50,23 +53,23 @@ final class AttunementSectionUI {
             return true;
         }
 
-        return AttunementManager.get().isAttunedTo(playerUUID, target);
+        return depotStorage.isAttunedTo(target);
     }
 
     @Nullable
-    UUID getSelectedOwnerUUID() {
+    public UUID getSelectedOwnerUUID() {
         return selectedOwnerUUID;
     }
 
-    boolean hasAttunements() {
-        if (!AttunementManager.get().getAttunedDepots(playerUUID).isEmpty()) {
+    public boolean hasAttunements() {
+        if (!depotStorage.getAttunedToMe().isEmpty()) {
             return true;
         }
 
-        return isOwnerView && !AttunementManager.get().getPlayersAttunedTo(playerUUID).isEmpty();
+        return isOwnerView && !depotStorage.getAttunedToOthers().isEmpty();
     }
 
-    void build(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
+    public void build(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
         cmd.clear("#AttunementPanel");
 
         if (pendingType != null) {
@@ -111,15 +114,14 @@ final class AttunementSectionUI {
     }
 
     private void buildNormal(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
-        List<AttunementManager.AttunedEntry> attuned = AttunementManager.get().getAttunedDepots(playerUUID);
-        List<AttunementManager.AttunedEntry> all = new ArrayList<>();
-        all.add(new AttunementManager.AttunedEntry(playerUUID, playerName));
+        List<AttunedEntry> attuned = depotStorage.getAttunedToMe();
+        List<AttunedEntry> all = new ArrayList<>();
+        all.add(new AttunedEntry(playerUUID, playerName));
         all.addAll(attuned);
-        lastEntries = all;
 
         int childIdx = 0;
 
-        for (AttunementManager.AttunedEntry entry : all) {
+        for (AttunedEntry entry : all) {
             String sel = "#AttunementPanel[" + childIdx + "]";
 
             cmd.append("#AttunementPanel", "Pages/OrbisDepotAttunementEntry.ui");
@@ -148,7 +150,7 @@ final class AttunementSectionUI {
         }
 
         if (isOwnerView) {
-            List<UUID> playersAttunedToMe = AttunementManager.get().getPlayersAttunedTo(playerUUID);
+            List<AttunedEntry> playersAttunedToMe = depotStorage.getAttunedToOthers();
             if (!playersAttunedToMe.isEmpty()) {
                 cmd.appendInline("#AttunementPanel", "Group { Anchor: (Height: 8); }");
                 cmd.appendInline("#AttunementPanel", "Group { Anchor: (Height: 1); Background: (Color: #2b3542); }");
@@ -156,26 +158,25 @@ final class AttunementSectionUI {
                 cmd.appendInline("#AttunementPanel", "Label { Text: \"MANAGE ACCESS\"; Style: (FontSize: 11, TextColor: #96a9be, RenderUppercase: true, RenderBold: true, HorizontalAlignment: Center); Anchor: (Height: 18); }");
                 childIdx += 4;
 
-                for (UUID attunedPlayerUUID : playersAttunedToMe) {
-                    String displayName = findNameForPlayer(attunedPlayerUUID);
+                for (AttunedEntry attunedPlayerUUID : playersAttunedToMe) {
                     String sel = "#AttunementPanel[" + childIdx + "]";
 
                     cmd.append("#AttunementPanel", "Pages/OrbisDepotAttunementEntry.ui");
-                    cmd.set(sel + " #AttunementCheckbox #AttunementLabel.Text", "X  " + displayName);
+                    cmd.set(sel + " #AttunementCheckbox #AttunementLabel.Text", "X  " + attunedPlayerUUID.ownerName());
                     cmd.set(sel + " #AttunementCheckbox #CheckBox.Value", false);
                     evt.addEventBinding(CustomUIEventBindingType.ValueChanged, sel + " #AttunementCheckbox #CheckBox",
-                            EventData.of(Constants.KEY_ACTION, "revoke-access:" + attunedPlayerUUID), false);
+                            EventData.of(Constants.KEY_ACTION, "revoke-access:" + attunedPlayerUUID.ownerUUID()), false);
                     childIdx++;
                 }
             }
         }
     }
 
-    boolean handleAction(@Nonnull String action) {
+    public boolean handleAction(@Nonnull String action) {
         if (action.startsWith("select-depot:")) {
             try {
                 selectedOwnerUUID = UUID.fromString(action.substring("select-depot:".length()));
-                AttunementManager.get().setSelectedTarget(contextKey, selectedOwnerUUID);
+                context.setSavedAttunement(selectedOwnerUUID);
                 return true;
             } catch (IllegalArgumentException ignored) {
             }
@@ -203,17 +204,17 @@ final class AttunementSectionUI {
         switch (action) {
             case "confirm-revoke" -> {
                 if (pendingTargetUUID != null) {
-                    AttunementManager.get().revokeAccess(playerUUID, pendingTargetUUID);
+                    depotStorage.removeAttunement(pendingTargetUUID);
                 }
                 clearPending();
                 return true;
             }
             case "confirm-leave" -> {
                 if (pendingTargetUUID != null) {
-                    AttunementManager.get().removeAttunement(playerUUID, pendingTargetUUID);
+                    depotStorage.removeAttunementToMe(pendingTargetUUID);
                     if (pendingTargetUUID.equals(selectedOwnerUUID)) {
                         selectedOwnerUUID = playerUUID;
-                        AttunementManager.get().setSelectedTarget(contextKey, playerUUID);
+                        context.setSavedAttunement(playerUUID);
                     }
                 }
                 clearPending();
@@ -233,16 +234,8 @@ final class AttunementSectionUI {
         pendingTargetName = null;
     }
 
-    boolean hasChanged() {
-        List<AttunementManager.AttunedEntry> current = AttunementManager.get().getAttunedDepots(playerUUID);
-        List<AttunementManager.AttunedEntry> all = new ArrayList<>();
-        all.add(new AttunementManager.AttunedEntry(playerUUID, playerName));
-        all.addAll(current);
-        return !all.equals(lastEntries);
-    }
-
     private String findNameForPlayer(UUID targetUUID) {
-        String name = AttunementManager.get().getPlayerName(targetUUID);
+        String name = depotStorage.getPlayerName(targetUUID);
         if (name != null) {
             return name;
         }
@@ -250,8 +243,8 @@ final class AttunementSectionUI {
     }
 
     private String findAttunedName(UUID ownerUUID) {
-        List<AttunementManager.AttunedEntry> entries = AttunementManager.get().getAttunedDepots(playerUUID);
-        for (AttunementManager.AttunedEntry entry : entries) {
+        List<AttunedEntry> entries = depotStorage.getAttunedToMe();
+        for (AttunedEntry entry : entries) {
             if (entry.ownerUUID().equals(ownerUUID)) {
                 return entry.ownerName();
             }

@@ -1,7 +1,7 @@
 package com.destbg.OrbisDepot.UI;
 
-import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.InventoryUtils;
@@ -17,90 +17,55 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-final class StorageSectionUI {
+public class StorageSectionUI {
 
     private final OrbisDepotStorageContext context;
-    private final List<String> displayedItemIds = new ArrayList<>();
     private String searchQuery = "";
-    private volatile UUID viewingOwnerOverride;
+    private DepotStorageData depotStorage;
 
-    StorageSectionUI(OrbisDepotStorageContext context) {
+    public StorageSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
+        depotStorage = context.getDepotStorageData();
     }
 
-    void setViewingOwner(UUID ownerUUID) {
-        this.viewingOwnerOverride = ownerUUID;
+    public void setDepotStorage(DepotStorageData depotStorage) {
+        this.depotStorage = depotStorage;
     }
 
-    private UUID getEffectiveOwner() {
-        UUID override = viewingOwnerOverride;
-        return override != null ? override : context.getOwnerUUID();
-    }
-
-    String getSearchQuery() {
+    public String getSearchQuery() {
         return searchQuery;
     }
 
-    void setSearchQuery(String query) {
+    public void setSearchQuery(String query) {
         this.searchQuery = query != null ? query.trim().toLowerCase() : "";
     }
 
-    boolean hasStorageItemsChanged() {
-        UUID owner = getEffectiveOwner();
-        if (owner == null) {
-            return false;
-        }
+    public void build(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
+        short additionalStacks = context.getAdditionalStacks();
 
         String q = searchQuery.isEmpty() ? "" : searchQuery;
-        Map<String, Long> items = q.isEmpty()
-                ? VoidStorageManager.get().getItems(owner)
-                : VoidStorageManager.get().searchItems(owner, q);
+        Map<String, Integer> items = q.isEmpty()
+                ? depotStorage.getItemContainer()
+                : depotStorage.searchItems(q);
 
-        List<String> currentIds = new ArrayList<>();
-        for (Map.Entry<String, Long> entry : items.entrySet()) {
-            if (entry.getValue() > 0) {
-                currentIds.add(entry.getKey());
-            }
-        }
-        return !currentIds.equals(displayedItemIds);
-    }
-
-    void build(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
-        UUID owner = getEffectiveOwner();
-        if (owner == null) {
-            return;
-        }
-
-        int stackMultiplier = context.getStackMultiplier();
-
-        String q = searchQuery.isEmpty() ? "" : searchQuery;
-        Map<String, Long> items = q.isEmpty()
-                ? VoidStorageManager.get().getItems(owner)
-                : VoidStorageManager.get().searchItems(owner, q);
-
-        displayedItemIds.clear();
         cmd.clear("#StorageCards");
 
         int i = 0;
-        for (Map.Entry<String, Long> entry : items.entrySet()) {
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
             String itemId = entry.getKey();
-            long quantity = entry.getValue();
+            int quantity = entry.getValue();
             if (quantity <= 0) {
                 continue;
             }
 
-            displayedItemIds.add(itemId);
             String sel = "#StorageCards[" + i + "]";
 
             cmd.append("#StorageCards", "Pages/OrbisDepotStorageItem.ui");
             cmd.set(sel + " #Slot.ItemId", itemId);
 
-            long maxForItem = (long) DepositUtils.getMaxStack(itemId) * stackMultiplier;
+            int maxForItem = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), additionalStacks);
             String qtyText = InventoryUtils.formatQuantity(quantity) + " / " + InventoryUtils.formatQuantity(maxForItem);
             cmd.set(sel + " #QuantityLabel.Text", qtyText);
 
@@ -111,30 +76,7 @@ final class StorageSectionUI {
         }
     }
 
-    void update(@NonNullDecl UICommandBuilder cmd) {
-        UUID owner = getEffectiveOwner();
-        if (owner == null) {
-            return;
-        }
-
-        Map<String, Long> allItems = VoidStorageManager.get().getItems(owner);
-        int stackMultiplier = context.getStackMultiplier();
-
-        for (int i = 0; i < displayedItemIds.size(); i++) {
-            String itemId = displayedItemIds.get(i);
-            long quantity = allItems.getOrDefault(itemId, 0L);
-            long maxForItem = (long) DepositUtils.getMaxStack(itemId) * stackMultiplier;
-            String sel = "#StorageCards[" + i + "]";
-            cmd.set(sel + " #QuantityLabel.Text", InventoryUtils.formatQuantity(quantity) + " / " + InventoryUtils.formatQuantity(maxForItem));
-        }
-    }
-
-    void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem, ItemTransferUtil transferUtil) {
-        UUID owner = getEffectiveOwner();
-        if (owner == null) {
-            return;
-        }
-
+    public void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem) {
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null) {
             return;
@@ -150,17 +92,16 @@ final class StorageSectionUI {
             return;
         }
 
-        VoidStorageManager vsm = VoidStorageManager.get();
-        long available = vsm.getItemCount(owner, itemId);
+        long available = depotStorage.getItemCount(itemId);
         if (available <= 0) {
             return;
         }
 
-        int maxStack = DepositUtils.getMaxStack(itemId);
+        int maxStack = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), context.getAdditionalStacks());
         int requestedAmount = singleItem ? 1 : (int) Math.min(maxStack, available);
-        int given = transferUtil.giveToPlayer(playerInv, itemId, requestedAmount);
+        int given = InventoryUtils.giveToPlayer(playerInv, itemId, requestedAmount, context.getAdditionalStacks());
         if (given > 0) {
-            vsm.removeItems(owner, itemId, given);
+            depotStorage.removeItems(itemId, given);
         }
     }
 }

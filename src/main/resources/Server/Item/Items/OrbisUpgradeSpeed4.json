@@ -1,0 +1,11 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.OrbisUpgradeSpeed4.name",
+    "Description": "server.items.OrbisUpgradeSpeed4.description"
+  },
+  "Categories": ["Items.Orbis_Depot"],
+  "Quality": "Legendary",
+  "ItemLevel": 1,
+  "MaxStack": 1,
+  "Icon": "Icons/ItemsGenerated/UpgradeSpeed.png"
+}

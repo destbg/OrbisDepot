@@ -1,0 +1,104 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Full: 0);
+  LayoutMode: Top;
+
+  Group {
+    FlexWeight: 1;
+  }
+
+  Group {
+    LayoutMode: Center;
+
+    Group #SlotBorder {
+      Anchor: (Width: 70, Height: 70);
+      Padding: 3;
+      Background: (Color: #1a2530);
+
+      ItemSlotButton #ConfirmSlotButton {
+        Anchor: (Full: 0);
+        Padding: 2;
+        Style: (
+          Default: (Background: #0f1a24),
+          Hovered: (Background: #0f1a24),
+          Pressed: (Background: #0f1a24),
+        );
+
+        ItemSlot #ConfirmSlot {
+          Anchor: (Full: 0);
+          ShowQualityBackground: true;
+          ShowQuantity: false;
+        }
+      }
+    }
+  }
+
+  Group {
+    Anchor: (Height: 10);
+  }
+
+  Label #ConfirmTitle {
+    Text: "Storage Upgrade I";
+    Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center);
+    Anchor: (Height: 20, Left: 12, Right: 12);
+  }
+
+  Group {
+    Anchor: (Height: 2);
+  }
+
+  Label #ConfirmDesc {
+    Text: "Upgrade capacity from 1 stack to 2 stacks per item";
+    Style: (FontSize: 11, TextColor: #96a9be, HorizontalAlignment: Center, Wrap: true);
+    Anchor: (Height: 36, Left: 12, Right: 12);
+  }
+
+  Group {
+    Anchor: (Height: 6);
+  }
+
+  Label #ConfirmCost {
+    Text: "Cost: 2 Voidhearts";
+    Style: (FontSize: 12, TextColor: #c8d6e5, HorizontalAlignment: Center);
+    Anchor: (Height: 18, Left: 12, Right: 12);
+  }
+
+  Label #ConfirmAvailable {
+    Text: "Available: 0";
+    Style: (FontSize: 11, TextColor: #96a9be, HorizontalAlignment: Center);
+    Anchor: (Height: 16, Left: 12, Right: 12);
+  }
+
+  Group {
+    Anchor: (Height: 10);
+  }
+
+  Button #ConfirmBtn {
+    Anchor: (Height: 28, Left: 24, Right: 24);
+    Style: (Default: (Background: #1e4a2e), Hovered: (Background: #27603b), Pressed: (Background: #163820));
+
+    Label {
+      Text: "Confirm";
+      Style: (FontSize: 13, TextColor: #a8d8a8, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+  }
+
+  Group {
+    Anchor: (Height: 6);
+  }
+
+  Button #CancelBtn {
+    Anchor: (Height: 28, Left: 24, Right: 24);
+    Style: (Default: (Background: #2b3542), Hovered: (Background: #3a4d60), Pressed: (Background: #1f2d3a));
+
+    Label {
+      Text: "Cancel";
+      Style: (FontSize: 13, TextColor: #c8d6e5, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+  }
+
+  Group {
+    FlexWeight: 1;
+  }
+}

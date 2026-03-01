@@ -1,8 +1,8 @@
 {
     "Group": "destbg",
-    "Name": "OrbisDepot",
-    "Version": "2.1.0",
-    "Description": "Description of your plugin",
+    "Name": "Orbis Depot",
+    "Version": "3.0.0",
+    "Description": "Orbis Depot adds a dynamic dimensional storage system to Hytale",
     "Authors": [
         {
             "Name": "destbg",

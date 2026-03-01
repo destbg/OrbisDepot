@@ -1,0 +1,13 @@
+Group {
+  LayoutMode: Top;
+  Padding: (Left: 12, Right: 12);
+
+  Group {
+    Anchor: (Height: 6);
+  }
+
+  Label {
+    Text: "Warning: Hytale can only process 1 UI update/event per tick. Enable \"Throttle UI updates\" to prevent missed inputs.";
+    Style: (FontSize: 13, TextColor: #e8a838, Wrap: true);
+  }
+}

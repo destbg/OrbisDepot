@@ -28,7 +28,7 @@ public class UseBlockCraftingSystem extends EntityEventSystem<EntityStore, UseBl
     }
 
     @Override
-    public void handle(int entityIndex, ArchetypeChunk<EntityStore> chunk, @NonNullDecl Store<EntityStore> store, @NonNullDecl CommandBuffer<EntityStore> buffer, @NonNullDecl UseBlockEvent.Post event) {
+    public void handle(int entityIndex, @NonNullDecl ArchetypeChunk<EntityStore> chunk, @NonNullDecl Store<EntityStore> store, @NonNullDecl CommandBuffer<EntityStore> buffer, @NonNullDecl UseBlockEvent.Post event) {
         Ref<EntityStore> ref = chunk.getReferenceTo(entityIndex);
         World world;
         try {

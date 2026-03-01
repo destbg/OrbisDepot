@@ -5,20 +5,38 @@
   },
   "PlayerAnimationsId": "Block",
   "Categories": [
-    "Items.Orbis_Depot"
+    "Furniture.Containers"
   ],
+  "Model": "Blocks/Dungeons/Chest_Epic_Small.blockymodel",
+  "Texture": "Blocks/Custom/Chest_Orbis_Depot.png",
+  "Scale": 0.6,
   "Icon": "Icons/ItemsGenerated/Orbis_Depot.png",
-  "IconProperties": {
-    "Scale": 0.58823,
-    "Rotation": [
-      22.5,
-      45,
-      22.5
+  "Recipe": {
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Arcanebench",
+        "Categories": [
+          "Arcane_Misc"
+        ]
+      }
     ],
-    "Translation": [
-      0,
-      -13.5
-    ]
+    "TimeSeconds": 5,
+    "Input": [
+      {
+        "ItemId": "Ingredient_Voidheart",
+        "Quantity": 1
+      },
+      {
+        "ItemId": "Ingredient_Bar_Silver",
+        "Quantity": 5
+      },
+      {
+        "ItemId": "Plant_Crop_Mana3",
+        "Quantity": 1
+      }
+    ],
+    "OutputQuantity": 1
   },
   "BlockType": {
     "BlockParticleSetId": "Metal",
@@ -42,7 +60,7 @@
     "HitboxType": "Chest_Small",
     "Material": "Solid",
     "Opacity": "Transparent",
-    "ParticleColor": "#373431",
+    "ParticleColor": "#461672",
     "State": {
       "Id": "OrbisDepot",
       "Capacity": 1,
@@ -98,14 +116,12 @@
           "Creative": {}
         }
       }
+    },
+    "Light": {
+      "Color": "#416",
+      "Radius": 1
     }
   },
-  "Model": "Blocks/Dungeons/Chest_Epic_Small.blockymodel",
-  "Texture": "Blocks/Custom/Chest_Orbis_Depot.png",
-  "Scale": 0.6,
-  "Variant": true,
-  "ItemSoundSetId": "ISS_Items_Metal",
-  "MaxStack": 10,
   "Tags": {
     "Type": [
       "Furniture"
@@ -114,34 +130,20 @@
       "Temple"
     ]
   },
-  "Recipe": {
-    "BenchRequirement": [
-      {
-        "Type": "Crafting",
-        "Id": "Workbench",
-        "Categories": [
-          "Workbench_Tinkering"
-        ],
-        "RequiredTierLevel": 2
-      }
+  "IconProperties": {
+    "Scale": 0.55,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
     ],
-    "TimeSeconds": 5,
-    "Input": [
-      {
-        "ItemId": "Ingredient_Voidheart",
-        "Quantity": 1
-      },
-      {
-        "ItemId": "Ingredient_Bar_Silver",
-        "Quantity": 5
-      },
-      {
-        "ItemId": "Plant_Crop_Mana3",
-        "Quantity": 1
-      }
-    ],
-    "OutputQuantity": 1
+    "Translation": [
+      0,
+      -15
+    ]
   },
-  "Quality": "Epic",
-  "ItemLevel": 40
+  "ItemSoundSetId": "ISS_Items_Metal",
+  "ItemLevel": 40,
+  "MaxStack": 10,
+  "Quality": "Epic"
 }

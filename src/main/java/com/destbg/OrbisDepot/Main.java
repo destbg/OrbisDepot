@@ -1,188 +1,140 @@
 package com.destbg.OrbisDepot;
 
 import com.destbg.OrbisDepot.Crafting.OrbisFieldCraftingWindow;
-import com.destbg.OrbisDepot.Crafting.PlaceBlockDepotSystem;
+import com.destbg.OrbisDepot.Crafting.PlaceBlockAutoRestoreSystem;
 import com.destbg.OrbisDepot.Crafting.UseBlockCraftingSystem;
-import com.destbg.OrbisDepot.Interactions.ConsumeAttunementInteraction;
-import com.destbg.OrbisDepot.Interactions.OpenCrudeOrbisSigilInteraction;
-import com.destbg.OrbisDepot.Interactions.OpenOrbisDepotInteraction;
-import com.destbg.OrbisDepot.Interactions.OpenOrbisSigilInteraction;
-import com.destbg.OrbisDepot.Storage.AttunementManager;
-import com.destbg.OrbisDepot.State.OrbisDepotBlockState;
-import com.destbg.OrbisDepot.Storage.PlayerSettingsManager;
-import com.destbg.OrbisDepot.Storage.VoidStorageManager;
+import com.destbg.OrbisDepot.Interactions.CrudeOrbisSigilOpenInteraction;
+import com.destbg.OrbisDepot.Interactions.OrbisDepotAttunementConsumeInteraction;
+import com.destbg.OrbisDepot.Interactions.OrbisDepotOpenInteraction;
+import com.destbg.OrbisDepot.Interactions.OrbisSigilOpenInteraction;
+import com.destbg.OrbisDepot.Components.DepotChunkData;
+import com.destbg.OrbisDepot.Storage.DepotStorageManager;
+import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
+import com.destbg.OrbisDepot.Systems.CrudeSigilTickingSystem;
+import com.destbg.OrbisDepot.Systems.DepotRefSystem;
+import com.destbg.OrbisDepot.Systems.DepotTickingSystem;
+import com.destbg.OrbisDepot.Systems.SigilTickingSystem;
+import com.destbg.OrbisDepot.Utils.ComponentUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
-import com.destbg.OrbisDepot.Utils.CraftingUtils;
-import com.destbg.OrbisDepot.Utils.CrudeSigilSlotUtils;
-import com.destbg.OrbisDepot.Utils.DepotSlotUtils;
-import com.destbg.OrbisDepot.Utils.SigilSlotUtils;
-import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.protocol.packets.window.WindowType;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.windows.Window;
+import com.hypixel.hytale.server.core.event.events.entity.LivingEntityInventoryChangeEvent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import javax.annotation.Nonnull;
-import java.lang.reflect.Method;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import java.util.UUID;
 
 public class Main extends JavaPlugin {
-
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-
-    private static volatile boolean initialized = false;
-    private static ComponentType<ChunkStore, OrbisDepotBlockState> orbisDepotComponentType;
-    private ScheduledExecutorService depositScheduler;
-
-    public Main(@Nonnull JavaPluginInit init) {
+    public Main(@NonNullDecl JavaPluginInit init) {
         super(init);
     }
 
     @Override
     protected void setup() {
-        this.getCodecRegistry(Interaction.CODEC).register("Crude_Orbis_Sigil_Open", OpenCrudeOrbisSigilInteraction.class, OpenCrudeOrbisSigilInteraction.CODEC);
-        this.getCodecRegistry(Interaction.CODEC).register("Orbis_Sigil_Open", OpenOrbisSigilInteraction.class, OpenOrbisSigilInteraction.CODEC);
-        this.getCodecRegistry(Interaction.CODEC).register("Orbis_Depot_Open", OpenOrbisDepotInteraction.class, OpenOrbisDepotInteraction.CODEC);
-        this.getCodecRegistry(Interaction.CODEC).register("Orbis_Depot_Attune", ConsumeAttunementInteraction.class, ConsumeAttunementInteraction.CODEC);
+        ComponentUtils.setup(this.getEntityStoreRegistry());
 
-        this.getEntityStoreRegistry().registerSystem(new UseBlockCraftingSystem());
-        this.getEntityStoreRegistry().registerSystem(new PlaceBlockDepotSystem());
+        this.getCodecRegistry(Interaction.CODEC).register(
+                "Crude_Orbis_Sigil_Open",
+                CrudeOrbisSigilOpenInteraction.class,
+                CrudeOrbisSigilOpenInteraction.CODEC
+        );
+        this.getCodecRegistry(Interaction.CODEC).register(
+                "Orbis_Sigil_Open",
+                OrbisSigilOpenInteraction.class,
+                OrbisSigilOpenInteraction.CODEC
+        );
+        this.getCodecRegistry(Interaction.CODEC).register(
+                "Orbis_Depot_Open",
+                OrbisDepotOpenInteraction.class,
+                OrbisDepotOpenInteraction.CODEC
+        );
+        this.getCodecRegistry(Interaction.CODEC).register(
+                "Orbis_Depot_Attune",
+                OrbisDepotAttunementConsumeInteraction.class,
+                OrbisDepotAttunementConsumeInteraction.CODEC
+        );
     }
 
     @Override
     protected void start() {
-        try {
-            LOGGER.at(Level.INFO).log("Registering block state...");
-            this.getBlockStateRegistry().registerBlockState(
-                    OrbisDepotBlockState.class,
-                    Constants.ORBIS_DEPOT_STATE_ID,
-                    OrbisDepotBlockState.CODEC
-            );
-            LOGGER.at(Level.INFO).log("Block state registered, resolving component type...");
-            orbisDepotComponentType = getBlockStateComponentType();
-            LOGGER.at(Level.INFO).log("Component type resolved: %s", orbisDepotComponentType);
+        this.getBlockStateRegistry().registerBlockState(
+                DepotChunkData.class,
+                Constants.ORBIS_DEPOT_STATE_ID,
+                DepotChunkData.CODEC
+        );
+        ComponentUtils.setupDepotChunkDataComponent();
+        DepotStorageManager.init(getDataDirectory());
+        LegacySlotMigration.init(getDataDirectory());
 
-            VoidStorageManager.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("VoidStorageManager initialized.");
-            PlayerSettingsManager.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("PlayerSettingsManager initialized.");
-            SigilSlotUtils.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("SigilSlotUtils initialized.");
-            CrudeSigilSlotUtils.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("CrudeSigilSlotUtils initialized.");
-            AttunementManager.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("AttunementManager initialized.");
-            DepotSlotUtils.init(getDataDirectory());
-            LOGGER.at(Level.INFO).log("DepotSlotUtils initialized.");
+        PermissionsModule.get().addGroupPermission("Adventure", Set.of(
+                Constants.PERM_DEPOT_USE,
+                Constants.PERM_SIGIL_USE
+        ));
 
-            PermissionsModule.get().addGroupPermission("Adventure", Set.of(
-                    Constants.PERM_DEPOT_USE,
-                    Constants.PERM_SIGIL_USE
-            ));
+        this.getEventRegistry().registerGlobal(LivingEntityInventoryChangeEvent.class, event -> {
+            if (!(event.getEntity() instanceof Player player)) {
+                return;
+            }
 
-            depositScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "OrbisDepot-DepositScheduler");
-                t.setDaemon(true);
-                return t;
-            });
-            depositScheduler.scheduleAtFixedRate(() -> {
-                try {
-                    SigilSlotUtils.tickAll(0.1f);
-                    CrudeSigilSlotUtils.tickAll(0.1f);
-                    DepotSlotUtils.tickAll(0.1f);
-                } catch (Exception e) {
-                    LOGGER.at(Level.SEVERE).withCause(e).log("Error in deposit processor");
+            Ref<EntityStore> ref = player.getReference();
+            if (ref == null) {
+                return;
+            }
+
+            Store<EntityStore> store = ref.getStore();
+            PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+            if (playerRef == null) {
+                return;
+            }
+
+            UUID uuid = playerRef.getUuid();
+            String name = playerRef.getUsername();
+
+            event.getItemContainer().forEach((slot, stack) -> {
+                if (stack == null || ItemStack.isEmpty(stack)) {
+                    return;
                 }
-            }, 100, 100, TimeUnit.MILLISECONDS);
+                if (!Constants.ATTUNEMENT_ITEM_ID.equals(stack.getItemId())) {
+                    return;
+                }
 
-            Window.CLIENT_REQUESTABLE_WINDOW_TYPES.put(
-                    WindowType.PocketCrafting,
-                    OrbisFieldCraftingWindow::new
-            );
+                String existingUUID = stack.getFromMetadataOrNull(Constants.META_CRAFTER_UUID, Codec.STRING);
+                if (existingUUID != null) {
+                    return;
+                }
 
-            initialized = true;
-            LOGGER.at(Level.INFO).log("Plugin started successfully.");
-        } catch (Throwable t) {
-            LOGGER.at(Level.SEVERE).withCause(t).log("FATAL: Plugin failed to start!");
-        }
+                ItemStack bound = stack
+                        .withMetadata(Constants.META_CRAFTER_UUID, Codec.STRING, uuid.toString())
+                        .withMetadata(Constants.META_CRAFTER_NAME, Codec.STRING, name);
+                event.getItemContainer().setItemStackForSlot(slot, bound);
+                player.sendMessage(Message.raw("Attunement bound to you. Give it to another player so they can access your Depot.").color("#7bed9f"));
+            });
+        });
+
+        this.getChunkStoreRegistry().registerSystem(new DepotRefSystem());
+        this.getChunkStoreRegistry().registerSystem(new DepotTickingSystem());
+        this.getEntityStoreRegistry().registerSystem(new SigilTickingSystem());
+        this.getEntityStoreRegistry().registerSystem(new CrudeSigilTickingSystem());
+        this.getEntityStoreRegistry().registerSystem(new UseBlockCraftingSystem());
+        this.getEntityStoreRegistry().registerSystem(new PlaceBlockAutoRestoreSystem());
+
+        Window.CLIENT_REQUESTABLE_WINDOW_TYPES.put(WindowType.PocketCrafting, OrbisFieldCraftingWindow::new);
     }
 
     @Override
     protected void shutdown() {
-        if (depositScheduler != null) {
-            depositScheduler.shutdown();
-            try {
-                var _ = depositScheduler.awaitTermination(5, TimeUnit.SECONDS);
-            } catch (InterruptedException ignored) {
-            }
-        }
-
-        CraftingUtils.cleanup();
-
-        try {
-            VoidStorageManager.get().saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving void storage on shutdown");
-        }
-
-        try {
-            PlayerSettingsManager.get().saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving player settings on shutdown");
-        }
-
-        try {
-            SigilSlotUtils.saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving sigil slots on shutdown");
-        }
-
-        try {
-            CrudeSigilSlotUtils.saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving crude sigil slots on shutdown");
-        }
-
-        try {
-            DepotSlotUtils.saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving depot slots on shutdown");
-        }
-
-        try {
-            AttunementManager.get().saveAll();
-        } catch (Exception e) {
-            LOGGER.at(Level.SEVERE).withCause(e).log("Error saving attunements on shutdown");
-        }
-
-        LOGGER.at(Level.INFO).log("Plugin shut down.");
-    }
-
-    @SuppressWarnings("unchecked")
-    private static ComponentType<ChunkStore, OrbisDepotBlockState> getBlockStateComponentType() {
-        try {
-            Class<?> moduleClass = Class.forName("com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule");
-            Method get = moduleClass.getMethod("get");
-            Object module = get.invoke(null);
-            Method getComponentType = moduleClass.getMethod("getComponentType", Class.class);
-            return (ComponentType<ChunkStore, OrbisDepotBlockState>) getComponentType.invoke(module, OrbisDepotBlockState.class);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to resolve block state component type for " + OrbisDepotBlockState.class.getName(), e);
-        }
-    }
-
-    public static boolean isInitialized() {
-        return initialized;
-    }
-
-    public static ComponentType<ChunkStore, OrbisDepotBlockState> getOrbisDepotComponentType() {
-        return orbisDepotComponentType;
+        DepotStorageManager.get().saveAll();
     }
 }

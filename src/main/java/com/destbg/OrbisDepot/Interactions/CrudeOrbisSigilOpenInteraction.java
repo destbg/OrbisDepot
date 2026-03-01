@@ -1,21 +1,24 @@
 package com.destbg.OrbisDepot.Interactions;
 
-import com.destbg.OrbisDepot.Main;
-import com.destbg.OrbisDepot.Storage.OrbisDepotStorageContext;
+import com.destbg.OrbisDepot.Components.CrudeSigilPlayerData;
+import com.destbg.OrbisDepot.Components.DepotStorageData;
+import com.destbg.OrbisDepot.Models.CrudeOrbisSigilStorageModel;
+import com.destbg.OrbisDepot.Storage.DepotStorageManager;
+import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
-import com.hypixel.hytale.protocol.AnimationSlot;
-import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -29,21 +32,16 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class OpenCrudeOrbisSigilInteraction extends SimpleInstantInteraction {
+public class CrudeOrbisSigilOpenInteraction extends SimpleInstantInteraction {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenCrudeOrbisSigilInteraction> CODEC = BuilderCodec.builder(
-            OpenCrudeOrbisSigilInteraction.class, OpenCrudeOrbisSigilInteraction::new, SimpleInstantInteraction.CODEC
+    public static final BuilderCodec<CrudeOrbisSigilOpenInteraction> CODEC = BuilderCodec.builder(
+            CrudeOrbisSigilOpenInteraction.class, CrudeOrbisSigilOpenInteraction::new, SimpleInstantInteraction.CODEC
     ).build();
 
     @Override
     protected void firstRun(@NonNullDecl InteractionType interactionType, @NonNullDecl InteractionContext interactionContext, @NonNullDecl CooldownHandler cooldownHandler) {
-        if (!Main.isInitialized()) {
-            interactionContext.getState().state = InteractionState.Failed;
-            return;
-        }
-
         CommandBuffer<EntityStore> commandBuffer = interactionContext.getCommandBuffer();
         if (commandBuffer == null) {
             interactionContext.getState().state = InteractionState.Failed;
@@ -76,9 +74,21 @@ public class OpenCrudeOrbisSigilInteraction extends SimpleInstantInteraction {
         }
 
         World world = commandBuffer.getExternalData().getWorld();
-        OrbisDepotStorageContext context = new OrbisDepotStorageContext.CrudeSigil(playerRef, world);
+        CrudeSigilPlayerData sigilPlayerData = commandBuffer.getComponent(ref, CrudeSigilPlayerData.getComponentType());
+        if (sigilPlayerData == null) {
+            sigilPlayerData = new CrudeSigilPlayerData();
+            sigilPlayerData.setSelectedAttunement(playerRef.getUuid());
+            LegacySlotMigration.migrateCrudeSigilSlots(playerRef.getUuid(), sigilPlayerData.getItemContainer());
+            commandBuffer.putComponent(ref, CrudeSigilPlayerData.getComponentType(), sigilPlayerData);
+        }
+
+        DepotStorageData depotStorageData = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
+
+        final CrudeSigilPlayerData finalSigilPlayerData = sigilPlayerData;
+        final DepotStorageData finalDepotStorageData = depotStorageData;
         CompletableFuture.runAsync(() -> {
             try {
+                CrudeOrbisSigilStorageModel context = new CrudeOrbisSigilStorageModel(world, finalSigilPlayerData, finalDepotStorageData);
                 Player p = store.getComponent(ref, Player.getComponentType());
                 if (p != null) {
                     AnimationUtils.playAnimation(ref, AnimationSlot.Action,
