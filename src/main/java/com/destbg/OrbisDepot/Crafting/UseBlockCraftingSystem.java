@@ -8,7 +8,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.event.events.ecs.UseBlockEvent;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -30,15 +29,7 @@ public class UseBlockCraftingSystem extends EntityEventSystem<EntityStore, UseBl
     @Override
     public void handle(int entityIndex, @NonNullDecl ArchetypeChunk<EntityStore> chunk, @NonNullDecl Store<EntityStore> store, @NonNullDecl CommandBuffer<EntityStore> buffer, @NonNullDecl UseBlockEvent.Post event) {
         Ref<EntityStore> ref = chunk.getReferenceTo(entityIndex);
-        World world;
-        try {
-            world = Universe.get().getDefaultWorld();
-        } catch (Exception e) {
-            return;
-        }
-        if (world == null) {
-            return;
-        }
+        World world = store.getExternalData().getWorld();
         CompletableFuture.delayedExecutor(200, TimeUnit.MILLISECONDS)
                 .execute(() -> CraftingUtils.onBlockUsed(ref, store, world));
     }

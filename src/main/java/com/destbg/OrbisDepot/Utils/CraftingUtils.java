@@ -137,30 +137,26 @@ public final class CraftingUtils {
     }
 
     public static void onStorageChanged(UUID playerUUID) {
-        World world;
+        PlayerRef playerRef;
         try {
-            world = Universe.get().getDefaultWorld();
+            playerRef = Universe.get().getPlayer(playerUUID);
         } catch (Exception e) {
             return;
         }
-        if (world == null) {
+        if (playerRef == null) {
             return;
         }
 
+        Ref<EntityStore> playerEntity = playerRef.getReference();
+        if (playerEntity == null) {
+            return;
+        }
+
+        Store<EntityStore> playerStore = playerEntity.getStore();
+        World world = playerStore.getExternalData().getWorld();
+
         CompletableFuture.runAsync(() -> {
             try {
-                PlayerRef playerRef = Universe.get().getPlayer(playerUUID);
-                if (playerRef == null) {
-                    return;
-                }
-
-                Ref<EntityStore> playerEntity = playerRef.getReference();
-                if (playerEntity == null) {
-                    return;
-                }
-
-                Store<EntityStore> playerStore = playerEntity.getStore();
-
                 SigilPlayerData sigilData = playerStore.getComponent(playerEntity, SigilPlayerData.getComponentType());
                 if (sigilData == null || !sigilData.setCraftingIntegration()) {
                     return;
