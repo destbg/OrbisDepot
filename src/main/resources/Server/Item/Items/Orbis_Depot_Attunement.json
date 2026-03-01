@@ -14,16 +14,12 @@
     "TimeSeconds": 2,
     "Input": [
       {
-        "ItemId": "Ingredient_Fabric_Scrap_Cindercloth",
-        "Quantity": 40
+        "ItemId": "Ingredient_Void_Essence",
+        "Quantity": 4
       },
       {
-        "ItemId": "Ingredient_Bar_Cobalt",
-        "Quantity": 8
-      },
-      {
-        "ItemId": "Ingredient_Leather_Heavy",
-        "Quantity": 24
+        "ItemId": "Ingredient_Bar_Gold",
+        "Quantity": 2
       }
     ],
     "BenchRequirement": [
@@ -32,8 +28,7 @@
         "Type": "Crafting",
         "Categories": [
           "Workbench_Tinkering"
-        ],
-        "RequiredTierLevel": 2
+        ]
       }
     ]
   },
