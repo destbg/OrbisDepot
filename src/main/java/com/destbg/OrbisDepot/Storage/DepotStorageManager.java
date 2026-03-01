@@ -98,7 +98,9 @@ public final class DepotStorageManager {
     }
 
     private void loadAll() {
-        if (!Files.isDirectory(storageDir)) return;
+        if (!Files.isDirectory(storageDir)) {
+            return;
+        }
         try (Stream<Path> files = Files.list(storageDir)) {
             files.filter(f -> f.toString().endsWith(".json")).forEach(this::loadFile);
         } catch (IOException e) {

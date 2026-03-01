@@ -9,6 +9,7 @@ import com.destbg.OrbisDepot.Interactions.OrbisDepotOpenInteraction;
 import com.destbg.OrbisDepot.Interactions.OrbisSigilOpenInteraction;
 import com.destbg.OrbisDepot.Components.DepotChunkData;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
+import com.destbg.OrbisDepot.Storage.LegacyDataMigration;
 import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.Systems.CrudeSigilTickingSystem;
 import com.destbg.OrbisDepot.Systems.DepotRefSystem;
@@ -75,6 +76,7 @@ public class Main extends JavaPlugin {
                 DepotChunkData.CODEC
         );
         ComponentUtils.setupDepotChunkDataComponent();
+        LegacyDataMigration.migrateFromRenamedDirectory(getDataDirectory());
         DepotStorageManager.init(getDataDirectory());
         LegacySlotMigration.init(getDataDirectory());
 

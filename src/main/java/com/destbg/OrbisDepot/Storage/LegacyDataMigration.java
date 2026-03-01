@@ -26,6 +26,51 @@ public final class LegacyDataMigration {
     private LegacyDataMigration() {
     }
 
+    public static void migrateFromRenamedDirectory(@Nonnull Path dataDirectory) {
+        if (dataDirectory.getParent() == null) {
+            return;
+        }
+        String oldName = dataDirectory.getFileName().toString().replace(" ", "");
+        if (oldName.equals(dataDirectory.getFileName().toString())) {
+            return;
+        }
+        Path oldDir = dataDirectory.getParent().resolve(oldName);
+        if (!Files.isDirectory(oldDir)) {
+            return;
+        }
+
+        LOGGER.at(Level.INFO).log(
+                "Detected old data directory '%s' — copying into '%s'...",
+                oldName, dataDirectory.getFileName());
+        try {
+            Files.createDirectories(dataDirectory);
+            Files.walkFileTree(oldDir, new SimpleFileVisitor<>() {
+                @Override
+                @Nonnull
+                public FileVisitResult preVisitDirectory(@Nonnull Path dir, @Nonnull BasicFileAttributes attrs) throws IOException {
+                    Path target = dataDirectory.resolve(oldDir.relativize(dir));
+                    Files.createDirectories(target);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                @Nonnull
+                public FileVisitResult visitFile(@Nonnull Path file, @Nonnull BasicFileAttributes attrs) throws IOException {
+                    Path target = dataDirectory.resolve(oldDir.relativize(file));
+                    if (!Files.exists(target)) {
+                        Files.copy(file, target);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            deleteDirectory(oldDir);
+            LOGGER.at(Level.INFO).log("Old data directory migration complete.");
+        } catch (Exception e) {
+            LOGGER.at(Level.SEVERE).withCause(e).log(
+                    "Failed to migrate from old data directory '%s' — old files have not been removed", oldName);
+        }
+    }
+
     public static void migrateIfNeeded(@Nonnull Path dataDirectory) {
         Path voidStorageDir = dataDirectory.resolve("void_storage");
         if (!Files.isDirectory(voidStorageDir)) {
@@ -204,13 +249,15 @@ public final class LegacyDataMigration {
         }
         Files.walkFileTree(dir, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            @Nonnull
+            public FileVisitResult visitFile(@Nonnull Path file, @Nonnull BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path d, IOException exc) throws IOException {
+            @Nonnull
+            public FileVisitResult postVisitDirectory(@Nonnull Path d, IOException exc) throws IOException {
                 if (exc != null) {
                     throw exc;
                 }
@@ -226,5 +273,6 @@ public final class LegacyDataMigration {
             Map<String, String> attunedToMe,
             int storageUpgradeRank,
             int speedUpgradeRank
-    ) {}
+    ) {
+    }
 }
