@@ -12,6 +12,7 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
@@ -38,9 +39,10 @@ public class DepotTickingSystem extends EntityTickingSystem<ChunkStore> {
 
         if (UploadClockUtils.shouldUpload(storage.getLastUploadTick(), storage.getTicksPerInterval())) {
             storage.setLastUploadTick(UploadClockUtils.currentTick());
-            var itemContainer = data.getItemContainer();
-            DepositUtils.attemptDeposit(itemContainer, storage, storage.getStorageUpgradeRank(), Constants.DEPOT_UPLOAD_SLOT_ADDITIONAL_STACKS);
-            OrbisDepotStorageUI.notifyViewersOf(ownerUuid, storage);
+            ItemContainer itemContainer = data.getItemContainer();
+            if (DepositUtils.attemptDeposit(itemContainer, storage, storage.getStorageUpgradeRank(), Constants.DEPOT_UPLOAD_SLOT_ADDITIONAL_STACKS)) {
+                OrbisDepotStorageUI.notifyViewersOf(ownerUuid, storage);
+            }
         }
     }
 

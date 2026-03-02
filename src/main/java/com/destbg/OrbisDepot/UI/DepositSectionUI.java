@@ -20,6 +20,8 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 public class DepositSectionUI {
 
     private final OrbisDepotStorageContext context;
+    private boolean[] lastOccupied;
+
     public DepositSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
     }
@@ -29,6 +31,7 @@ public class DepositSectionUI {
         int slotCount = context.getDepositSlotCount();
 
         cmd.clear("#DepositSlots");
+        lastOccupied = new boolean[slotCount];
         boolean hasItems = false;
         for (int i = 0; i < slotCount; i++) {
             String sel = "#DepositSlots[" + i + "]";
@@ -39,6 +42,7 @@ public class DepositSectionUI {
 
                 if (stack != null && !ItemStack.isEmpty(stack)) {
                     hasItems = true;
+                    lastOccupied[i] = true;
                     cmd.set(sel + " #Slot.ItemId", stack.getItemId());
 
                     if (stack.getQuantity() > 1) {
@@ -47,6 +51,39 @@ public class DepositSectionUI {
 
                     evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "cancel-upload:" + i));
                 }
+            }
+        }
+
+        applyProgressStatus(cmd, hasItems);
+    }
+
+    public void buildTick(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
+        ItemContainer depositSlots = context.getUploadSlotContainer();
+        int slotCount = context.getDepositSlotCount();
+
+        if (lastOccupied == null || lastOccupied.length != slotCount) {
+            build(cmd, evt);
+            return;
+        }
+
+        for (int i = 0; i < slotCount && i < depositSlots.getCapacity(); i++) {
+            ItemStack stack = depositSlots.getItemStack((short) i);
+            if (lastOccupied[i] && (stack == null || ItemStack.isEmpty(stack))) {
+                build(cmd, evt);
+                return;
+            }
+        }
+
+        boolean hasItems = false;
+        for (int i = 0; i < slotCount && i < depositSlots.getCapacity(); i++) {
+            ItemStack stack = depositSlots.getItemStack((short) i);
+            if (stack != null && !ItemStack.isEmpty(stack)) {
+                hasItems = true;
+                lastOccupied[i] = true;
+                String sel = "#DepositSlots[" + i + "]";
+                cmd.set(sel + " #Slot.ItemId", stack.getItemId());
+                cmd.set(sel + " #QuantityLabel.Text",
+                        stack.getQuantity() > 1 ? String.valueOf(stack.getQuantity()) : "");
             }
         }
 

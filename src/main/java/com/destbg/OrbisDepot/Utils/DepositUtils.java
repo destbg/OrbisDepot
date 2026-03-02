@@ -8,7 +8,8 @@ import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import javax.annotation.Nonnull;
 
 public final class DepositUtils {
-    public static void attemptDeposit(@Nonnull ItemContainer itemContainer, @Nonnull DepotStorageData storage, int rank, short additionalStacks) {
+    public static boolean attemptDeposit(@Nonnull ItemContainer itemContainer, @Nonnull DepotStorageData storage, int rank, short additionalStacks) {
+        boolean deposited = false;
         for (short slot = 0; slot < itemContainer.getCapacity(); slot++) {
             ItemStack stack = itemContainer.getItemStack(slot);
             if (stack == null || ItemStack.isEmpty(stack)) {
@@ -39,7 +40,9 @@ public final class DepositUtils {
             }
 
             storage.addItem(itemId, 1);
+            deposited = true;
         }
+        return deposited;
     }
 
     public static boolean isDepositEligible(@Nonnull ItemStack stack) {

@@ -17,6 +17,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class StorageSectionUI {
@@ -24,6 +25,7 @@ public class StorageSectionUI {
     private final OrbisDepotStorageContext context;
     private String searchQuery = "";
     private DepotStorageData depotStorage;
+    private final Map<String, Integer> renderedItemIndices = new HashMap<>();
 
     public StorageSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
@@ -51,6 +53,7 @@ public class StorageSectionUI {
                 : depotStorage.searchItems(q);
 
         cmd.clear("#StorageCards");
+        renderedItemIndices.clear();
 
         int i = 0;
         for (Map.Entry<String, Integer> entry : items.entrySet()) {
@@ -72,7 +75,37 @@ public class StorageSectionUI {
             evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "withdraw:" + itemId));
             evt.addEventBinding(CustomUIEventBindingType.RightClicking, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "withdraw-one:" + itemId));
 
+            renderedItemIndices.put(itemId, i);
             i++;
+        }
+    }
+
+    public void buildTick(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
+        short additionalStacks = context.getAdditionalStacks();
+
+        String q = searchQuery.isEmpty() ? "" : searchQuery;
+        Map<String, Integer> items = q.isEmpty()
+                ? depotStorage.getItemContainer()
+                : depotStorage.searchItems(q);
+
+        for (String itemId : items.keySet()) {
+            if (!renderedItemIndices.containsKey(itemId)) {
+                build(cmd, evt);
+                return;
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+            String itemId = entry.getKey();
+            int quantity = entry.getValue();
+            Integer index = renderedItemIndices.get(itemId);
+            if (index == null || quantity <= 0) {
+                continue;
+            }
+            String sel = "#StorageCards[" + index + "]";
+            int maxForItem = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), additionalStacks);
+            String qtyText = InventoryUtils.formatQuantity(quantity) + " / " + InventoryUtils.formatQuantity(maxForItem);
+            cmd.set(sel + " #QuantityLabel.Text", qtyText);
         }
     }
 

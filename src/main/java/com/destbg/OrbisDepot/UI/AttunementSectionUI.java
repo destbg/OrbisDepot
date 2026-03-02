@@ -24,8 +24,6 @@ public class AttunementSectionUI {
     private final boolean isOwnerView;
     private UUID selectedOwnerUUID;
 
-    private enum ConfirmationType {REVOKE, LEAVE}
-
     @Nullable
     private ConfirmationType pendingType;
     @Nullable
@@ -251,4 +249,6 @@ public class AttunementSectionUI {
         }
         return ownerUUID.toString().substring(0, 8);
     }
+
+    private enum ConfirmationType {REVOKE, LEAVE}
 }

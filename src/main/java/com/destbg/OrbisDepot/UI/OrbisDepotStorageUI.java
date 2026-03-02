@@ -129,8 +129,8 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         syncSelectedStorage();
         UICommandBuilder cmd = new UICommandBuilder();
         UIEventBuilder evt = new UIEventBuilder();
-        storageSection.build(cmd, evt);
-        depositSection.build(cmd, evt);
+        storageSection.buildTick(cmd, evt);
+        depositSection.buildTick(cmd, evt);
         sendUpdate(cmd, evt, false);
     }
 
