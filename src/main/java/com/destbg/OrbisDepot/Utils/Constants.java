@@ -20,7 +20,6 @@ public final class Constants {
 
     public static final String CHECKBOX_AUTO_PLACE = "AutoPlace";
     public static final String CHECKBOX_CRAFTING = "Crafting";
-    public static final String CHECKBOX_THROTTLE_UI = "ThrottleUi";
 
     public static final float UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS = 2.0f;
     public static final float UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS = 4.0f;

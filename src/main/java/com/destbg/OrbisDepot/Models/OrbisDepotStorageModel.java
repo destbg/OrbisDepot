@@ -106,15 +106,6 @@ public class OrbisDepotStorageModel implements OrbisDepotStorageContext {
     public void setCraftingIntegration(boolean b) {
     }
 
-    @Override
-    public boolean isThrottleUiUpdates() {
-        return false;
-    }
-
-    @Override
-    public void setThrottleUiUpdates(boolean b) {
-    }
-
     @Nonnull
     public Vector3i getLocation() {
         return location;

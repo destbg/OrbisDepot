@@ -95,13 +95,4 @@ public class OrbisSigilStorageModel implements OrbisDepotStorageContext {
         sigilPlayerData.setCraftingIntegration(b);
     }
 
-    @Override
-    public boolean isThrottleUiUpdates() {
-        return sigilPlayerData.isThrottleUiUpdates();
-    }
-
-    @Override
-    public void setThrottleUiUpdates(boolean b) {
-        sigilPlayerData.setThrottleUiUpdates(b);
-    }
 }

@@ -40,7 +40,4 @@ public interface OrbisDepotStorageContext {
 
     void setCraftingIntegration(boolean b);
 
-    boolean isThrottleUiUpdates();
-
-    void setThrottleUiUpdates(boolean b);
 }

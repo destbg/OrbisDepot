@@ -62,12 +62,7 @@ public class SigilTickingSystem extends EntityTickingSystem<EntityStore> {
         if (UploadClockUtils.shouldUpload(data.getLastUploadTick(), playerStorage.getTicksPerInterval())) {
             data.setLastUploadTick(UploadClockUtils.currentTick());
             SimpleItemContainer itemContainer = data.getItemContainer();
-            if (DepositUtils.attemptDeposit(itemContainer, targetStorage, targetStorage.getStorageUpgradeRank(), Constants.SIGIL_UPLOAD_SLOT_ADDITIONAL_STACKS)) {
-                UUID depositedToUUID = (selectedAttunement != null && !selectedAttunement.equals(playerUUID))
-                        ? selectedAttunement
-                        : playerUUID;
-                OrbisDepotStorageUI.notifyViewersOf(depositedToUUID, targetStorage);
-            }
+            DepositUtils.attemptDeposit(itemContainer, targetStorage, targetStorage.getStorageUpgradeRank(), Constants.SIGIL_UPLOAD_SLOT_ADDITIONAL_STACKS);
         }
     }
 

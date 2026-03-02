@@ -14,6 +14,7 @@ import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.Systems.CrudeSigilTickingSystem;
 import com.destbg.OrbisDepot.Systems.DepotRefSystem;
 import com.destbg.OrbisDepot.Systems.DepotTickingSystem;
+import com.destbg.OrbisDepot.Systems.ProgressTickSystem;
 import com.destbg.OrbisDepot.Systems.SigilTickingSystem;
 import com.destbg.OrbisDepot.Utils.ComponentUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
@@ -129,6 +130,7 @@ public class Main extends JavaPlugin {
         this.getChunkStoreRegistry().registerSystem(new DepotTickingSystem());
         this.getEntityStoreRegistry().registerSystem(new SigilTickingSystem());
         this.getEntityStoreRegistry().registerSystem(new CrudeSigilTickingSystem());
+        this.getEntityStoreRegistry().registerSystem(new ProgressTickSystem());
         this.getEntityStoreRegistry().registerSystem(new UseBlockCraftingSystem());
         this.getEntityStoreRegistry().registerSystem(new PlaceBlockAutoRestoreSystem());
 

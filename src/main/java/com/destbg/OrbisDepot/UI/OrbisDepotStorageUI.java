@@ -1,12 +1,8 @@
 package com.destbg.OrbisDepot.UI;
 
 import com.destbg.OrbisDepot.Components.DepotStorageData;
-import com.destbg.OrbisDepot.Models.AttunedEntry;
 import com.destbg.OrbisDepot.Models.*;
-import com.destbg.OrbisDepot.Utils.BlockStateUtils;
-import com.destbg.OrbisDepot.Utils.Constants;
-import com.destbg.OrbisDepot.Utils.DepotOwnerUtils;
-import com.destbg.OrbisDepot.Utils.SoundUtils;
+import com.destbg.OrbisDepot.Utils.*;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -16,23 +12,20 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-
-import java.util.UUID;
-
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -43,7 +36,8 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     private final OrbisDepotStorageContext context;
     private volatile Ref<EntityStore> lastRef;
     private volatile Store<EntityStore> lastStore;
-    private volatile long lastTickUpdateMs = 0;
+    private volatile long lastProgressTick = 0;
+    private volatile boolean lastHadDepositItems = false;
     private final DepositSectionUI depositSection;
     private final StorageSectionUI storageSection;
     private final SettingsSectionUI settingsSection;
@@ -117,53 +111,52 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         if (settingsSection != null) {
             settingsSection.build(uiCommandBuilder, uiEventBuilder);
         }
+        if (context.getTickIntervalSeconds() <= 0.5f) {
+            uiCommandBuilder.remove("#UploadProgressBar");
+            uiCommandBuilder.remove("#UploadProgressBarSpacer");
+        } else if (hasDepositItems()) {
+            uiCommandBuilder.set("#UploadProgressBar.Value", context.getUploadProgress());
+        } else {
+            uiCommandBuilder.set("#UploadProgressBar.Value", 0.0f);
+        }
     }
 
-    private void sendTickUpdate() {
-        long now = System.currentTimeMillis();
-        long minInterval = context.isThrottleUiUpdates() ? 1000 : 20;
-        if (now - lastTickUpdateMs < minInterval) {
+    public void sendProgressUpdate() {
+        long tick = UploadClockUtils.currentTick();
+        if (tick == lastProgressTick) {
             return;
         }
-        lastTickUpdateMs = now;
+        lastProgressTick = tick;
         syncSelectedStorage();
         UICommandBuilder cmd = new UICommandBuilder();
         UIEventBuilder evt = new UIEventBuilder();
-        storageSection.buildTick(cmd, evt);
-        depositSection.buildTick(cmd, evt);
-        sendUpdate(cmd, evt, false);
-    }
-
-    public void notifyIfViewing(UUID storageOwnerUUID) {
-        if (storageOwnerUUID.equals(attunementSection.getSelectedOwnerUUID())) {
-            sendTickUpdate();
+        boolean hasChanges = storageSection.buildTick(cmd, evt);
+        hasChanges |= depositSection.buildTick(cmd, evt);
+        if (context.getTickIntervalSeconds() > 0.5f) {
+            boolean hasItems = hasDepositItems();
+            if (hasItems) {
+                cmd.set("#UploadProgressBar.Value", context.getUploadProgress());
+                hasChanges = true;
+            } else if (lastHadDepositItems) {
+                cmd.set("#UploadProgressBar.Value", 0.0f);
+                hasChanges = true;
+            }
+            lastHadDepositItems = hasItems;
+        }
+        if (hasChanges) {
+            sendUpdate(cmd, evt, false);
         }
     }
 
-    public static void notifyViewersOf(UUID storageOwnerUUID, DepotStorageData targetStorage) {
-        notifyPlayerIfViewing(storageOwnerUUID, storageOwnerUUID);
-        for (AttunedEntry entry : targetStorage.getAttunedToOthers()) {
-            notifyPlayerIfViewing(entry.ownerUUID(), storageOwnerUUID);
+    private boolean hasDepositItems() {
+        ItemContainer slots = context.getUploadSlotContainer();
+        for (short i = 0; i < slots.getCapacity(); i++) {
+            ItemStack stack = slots.getItemStack(i);
+            if (stack != null && !ItemStack.isEmpty(stack)) {
+                return true;
+            }
         }
-    }
-
-    private static void notifyPlayerIfViewing(UUID playerUUID, UUID storageOwnerUUID) {
-        PlayerRef playerRef = Universe.get().getPlayer(playerUUID);
-        if (playerRef == null) {
-            return;
-        }
-        Ref<EntityStore> entityRef = playerRef.getReference();
-        if (entityRef == null) {
-            return;
-        }
-        Player player = entityRef.getStore().getComponent(entityRef, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-        CustomUIPage page = player.getPageManager().getCustomPage();
-        if (page instanceof OrbisDepotStorageUI depotPage) {
-            depotPage.notifyIfViewing(storageOwnerUUID);
-        }
+        return false;
     }
 
     private void syncSelectedStorage() {

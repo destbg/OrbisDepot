@@ -7,7 +7,7 @@ Group {
   }
 
   Label {
-    Text: "Warning: Hytale can only process 1 UI update/event per tick. Enable \"Throttle UI updates\" to prevent missed inputs.";
+    Text: "Warning: Hytale can only process 1 UI update/event per tick. You might get some missed inputs, it is normal.";
     Style: (FontSize: 13, TextColor: #e8a838, Wrap: true);
   }
 }

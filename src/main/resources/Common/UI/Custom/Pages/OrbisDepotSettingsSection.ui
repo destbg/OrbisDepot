@@ -25,13 +25,5 @@ Group {
       @Checked = true;
     }
 
-    Group {
-      Anchor: (Height: 6);
-    }
-
-    $C.@CheckBoxWithLabel #ThrottleUiToggle {
-      @Text = "Throttle UI updates (1/s)";
-      @Checked = false;
-    }
   }
 }

@@ -40,9 +40,7 @@ public class DepotTickingSystem extends EntityTickingSystem<ChunkStore> {
         if (UploadClockUtils.shouldUpload(storage.getLastUploadTick(), storage.getTicksPerInterval())) {
             storage.setLastUploadTick(UploadClockUtils.currentTick());
             ItemContainer itemContainer = data.getItemContainer();
-            if (DepositUtils.attemptDeposit(itemContainer, storage, storage.getStorageUpgradeRank(), Constants.DEPOT_UPLOAD_SLOT_ADDITIONAL_STACKS)) {
-                OrbisDepotStorageUI.notifyViewersOf(ownerUuid, storage);
-            }
+            DepositUtils.attemptDeposit(itemContainer, storage, storage.getStorageUpgradeRank(), Constants.DEPOT_UPLOAD_SLOT_ADDITIONAL_STACKS);
         }
     }
 

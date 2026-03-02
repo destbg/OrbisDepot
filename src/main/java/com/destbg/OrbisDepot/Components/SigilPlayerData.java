@@ -32,23 +32,18 @@ public class SigilPlayerData implements Component<EntityStore> {
             .append(new KeyedCodec<>("CraftingIntegration", Codec.BOOLEAN),
                     (component, value) -> component.craftingIntegration = value,
                     component -> component.craftingIntegration).add()
-            .append(new KeyedCodec<>("ThrottleUiUpdates", Codec.BOOLEAN),
-                    (component, value) -> component.throttleUiUpdates = value,
-                    component -> component.throttleUiUpdates).add()
             .build();
 
     private SimpleItemContainer itemContainer;
     private UUID selectedAttunement;
     private boolean autoRestore;
     private boolean craftingIntegration;
-    private boolean throttleUiUpdates;
     private transient long lastUploadTick;
 
     public SigilPlayerData() {
         itemContainer = new SimpleItemContainer(Constants.SIGIL_UPLOAD_SLOT_CAPACITY);
         autoRestore = true;
         craftingIntegration = true;
-        throttleUiUpdates = false;
     }
 
     public SigilPlayerData(SigilPlayerData clone) {
@@ -56,7 +51,6 @@ public class SigilPlayerData implements Component<EntityStore> {
         this.selectedAttunement = clone.selectedAttunement;
         this.autoRestore = clone.autoRestore;
         this.craftingIntegration = clone.craftingIntegration;
-        this.throttleUiUpdates = clone.throttleUiUpdates;
         this.lastUploadTick = clone.lastUploadTick;
     }
 
@@ -94,14 +88,6 @@ public class SigilPlayerData implements Component<EntityStore> {
 
     public void setCraftingIntegration(boolean craftingIntegration) {
         this.craftingIntegration = craftingIntegration;
-    }
-
-    public boolean isThrottleUiUpdates() {
-        return throttleUiUpdates;
-    }
-
-    public void setThrottleUiUpdates(boolean throttleUiUpdates) {
-        this.throttleUiUpdates = throttleUiUpdates;
     }
 
     @Nonnull

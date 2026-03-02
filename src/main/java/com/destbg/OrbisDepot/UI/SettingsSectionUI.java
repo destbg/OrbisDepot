@@ -223,7 +223,6 @@ public class SettingsSectionUI {
         if (locked) return;
         cmd.set("#AutoPlaceToggle #CheckBox.Value", context.isAutoRestoreEnabled());
         cmd.set("#CraftingToggle #CheckBox.Value", context.isCraftingIntegrationEnabled());
-        cmd.set("#ThrottleUiToggle #CheckBox.Value", context.isThrottleUiUpdates());
     }
 
     public void bindCheckboxEvents(@Nonnull UIEventBuilder evt) {
@@ -234,8 +233,6 @@ public class SettingsSectionUI {
                 EventData.of(Constants.KEY_CHECKBOX, Constants.CHECKBOX_AUTO_PLACE), false);
         evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#CraftingToggle #CheckBox",
                 EventData.of(Constants.KEY_CHECKBOX, Constants.CHECKBOX_CRAFTING), false);
-        evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#ThrottleUiToggle #CheckBox",
-                EventData.of(Constants.KEY_CHECKBOX, Constants.CHECKBOX_THROTTLE_UI), false);
     }
 
     public void handleCheckbox(@Nonnull String checkboxId) {
@@ -245,7 +242,6 @@ public class SettingsSectionUI {
         switch (checkboxId) {
             case Constants.CHECKBOX_AUTO_PLACE -> context.setAutoRestore(!context.isAutoRestoreEnabled());
             case Constants.CHECKBOX_CRAFTING -> context.setCraftingIntegration(!context.isCraftingIntegrationEnabled());
-            case Constants.CHECKBOX_THROTTLE_UI -> context.setThrottleUiUpdates(!context.isThrottleUiUpdates());
         }
     }
 

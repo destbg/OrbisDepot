@@ -26,6 +26,7 @@ public class StorageSectionUI {
     private String searchQuery = "";
     private DepotStorageData depotStorage;
     private final Map<String, Integer> renderedItemIndices = new HashMap<>();
+    private final Map<String, Integer> lastRenderedQuantities = new HashMap<>();
 
     public StorageSectionUI(OrbisDepotStorageContext context) {
         this.context = context;
@@ -54,6 +55,7 @@ public class StorageSectionUI {
 
         cmd.clear("#StorageCards");
         renderedItemIndices.clear();
+        lastRenderedQuantities.clear();
 
         int i = 0;
         for (Map.Entry<String, Integer> entry : items.entrySet()) {
@@ -76,11 +78,12 @@ public class StorageSectionUI {
             evt.addEventBinding(CustomUIEventBindingType.RightClicking, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "withdraw-one:" + itemId));
 
             renderedItemIndices.put(itemId, i);
+            lastRenderedQuantities.put(itemId, quantity);
             i++;
         }
     }
 
-    public void buildTick(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
+    public boolean buildTick(@NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt) {
         short additionalStacks = context.getAdditionalStacks();
 
         String q = searchQuery.isEmpty() ? "" : searchQuery;
@@ -91,10 +94,11 @@ public class StorageSectionUI {
         for (String itemId : items.keySet()) {
             if (!renderedItemIndices.containsKey(itemId)) {
                 build(cmd, evt);
-                return;
+                return true;
             }
         }
 
+        boolean changed = false;
         for (Map.Entry<String, Integer> entry : items.entrySet()) {
             String itemId = entry.getKey();
             int quantity = entry.getValue();
@@ -102,11 +106,18 @@ public class StorageSectionUI {
             if (index == null || quantity <= 0) {
                 continue;
             }
+            Integer last = lastRenderedQuantities.get(itemId);
+            if (last != null && last == quantity) {
+                continue;
+            }
             String sel = "#StorageCards[" + index + "]";
             int maxForItem = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), additionalStacks);
             String qtyText = InventoryUtils.formatQuantity(quantity) + " / " + InventoryUtils.formatQuantity(maxForItem);
             cmd.set(sel + " #QuantityLabel.Text", qtyText);
+            lastRenderedQuantities.put(itemId, quantity);
+            changed = true;
         }
+        return changed;
     }
 
     public void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem) {

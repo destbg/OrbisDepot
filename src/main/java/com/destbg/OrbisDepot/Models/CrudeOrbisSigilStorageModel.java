@@ -96,12 +96,4 @@ public class CrudeOrbisSigilStorageModel implements OrbisDepotStorageContext {
     public void setCraftingIntegration(boolean b) {
     }
 
-    @Override
-    public boolean isThrottleUiUpdates() {
-        return true;
-    }
-
-    @Override
-    public void setThrottleUiUpdates(boolean b) {
-    }
 }
