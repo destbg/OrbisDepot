@@ -3,6 +3,7 @@ package com.destbg.OrbisDepot.Models;
 import com.destbg.OrbisDepot.Components.CrudeSigilPlayerData;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.UploadClockUtils;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.World;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -50,12 +51,13 @@ public class CrudeOrbisSigilStorageModel implements OrbisDepotStorageContext {
 
     @Override
     public void resetUploadTimer() {
-        crudeSigilPlayerData.resetElapsedTime();
     }
 
     @Override
     public float getUploadProgress() {
-        return crudeSigilPlayerData.getElapsedTime() / crudeSigilPlayerData.getTickInterval();
+        long now = UploadClockUtils.currentTick();
+        long lastBoundary = (now / Constants.CRUDE_SIGIL_TICKS_PER_UPLOAD) * Constants.CRUDE_SIGIL_TICKS_PER_UPLOAD;
+        return (float) (now - lastBoundary) / Constants.CRUDE_SIGIL_TICKS_PER_UPLOAD;
     }
 
     @Override

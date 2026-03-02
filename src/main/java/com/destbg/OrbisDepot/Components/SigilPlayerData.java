@@ -42,6 +42,7 @@ public class SigilPlayerData implements Component<EntityStore> {
     private boolean autoRestore;
     private boolean craftingIntegration;
     private boolean throttleUiUpdates;
+    private transient long lastUploadTick;
 
     public SigilPlayerData() {
         itemContainer = new SimpleItemContainer(Constants.SIGIL_UPLOAD_SLOT_CAPACITY);
@@ -56,6 +57,15 @@ public class SigilPlayerData implements Component<EntityStore> {
         this.autoRestore = clone.autoRestore;
         this.craftingIntegration = clone.craftingIntegration;
         this.throttleUiUpdates = clone.throttleUiUpdates;
+        this.lastUploadTick = clone.lastUploadTick;
+    }
+
+    public long getLastUploadTick() {
+        return lastUploadTick;
+    }
+
+    public void setLastUploadTick(long tick) {
+        this.lastUploadTick = tick;
     }
 
     public SimpleItemContainer getItemContainer() {

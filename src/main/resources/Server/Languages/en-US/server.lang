@@ -21,4 +21,4 @@ items.OrbisUpgradeSpeed2.description=Upgrade deposit speed from 60 to 90 items/s
 items.OrbisUpgradeSpeed3.name=Speed Upgrade III
 items.OrbisUpgradeSpeed3.description=Upgrade deposit speed from 90 to 120 items/slot/min. Cost: 16 Voidhearts
 items.OrbisUpgradeSpeed4.name=Speed Upgrade IV
-items.OrbisUpgradeSpeed4.description=Upgrade deposit speed from 120 to 240 items/slot/min. Cost: 32 Voidhearts
+items.OrbisUpgradeSpeed4.description=Upgrade deposit speed from 120 to 240 items/slot/min. Cost: 64 Voidhearts

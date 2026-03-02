@@ -7,6 +7,7 @@ import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.DepotOwnerUtils;
+import com.destbg.OrbisDepot.Utils.UploadClockUtils;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -58,9 +59,8 @@ public class CrudeSigilTickingSystem extends EntityTickingSystem<EntityStore> {
             targetStorage = playerStorage;
         }
 
-        data.addElapsedTime(v);
-        if (data.getElapsedTime() >= Constants.UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS) {
-            data.resetElapsedTime();
+        if (UploadClockUtils.shouldUpload(data.getLastUploadTick(), Constants.CRUDE_SIGIL_TICKS_PER_UPLOAD)) {
+            data.setLastUploadTick(UploadClockUtils.currentTick());
             SimpleItemContainer itemContainer = data.getItemContainer();
             DepositUtils.attemptDeposit(itemContainer, targetStorage, targetStorage.getStorageUpgradeRank(), Constants.CRUDE_SIGIL_UPLOAD_SLOT_ADDITIONAL_STACKS);
 

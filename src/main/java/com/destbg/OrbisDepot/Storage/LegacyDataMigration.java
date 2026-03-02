@@ -239,8 +239,6 @@ public final class LegacyDataMigration {
         deleteDirectory(dataDirectory.resolve("attunement_prefs"));
         deleteDirectory(dataDirectory.resolve("player_settings"));
         Files.deleteIfExists(dataDirectory.resolve("player_names.json"));
-        // sigil_slots, crude_sigil_slots, and depot_slots are migrated lazily into ECS
-        // components on first interaction — do not bulk-delete them here.
     }
 
     private static void deleteDirectory(@Nonnull Path dir) throws IOException {

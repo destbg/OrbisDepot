@@ -120,13 +120,12 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     }
 
     private void sendTickUpdate() {
-        if (context.isThrottleUiUpdates()) {
-            long now = System.currentTimeMillis();
-            if (now - lastTickUpdateMs < 1000) {
-                return;
-            }
-            lastTickUpdateMs = now;
+        long now = System.currentTimeMillis();
+        long minInterval = context.isThrottleUiUpdates() ? 1000 : 20;
+        if (now - lastTickUpdateMs < minInterval) {
+            return;
         }
+        lastTickUpdateMs = now;
         syncSelectedStorage();
         UICommandBuilder cmd = new UICommandBuilder();
         UIEventBuilder evt = new UIEventBuilder();

@@ -51,12 +51,11 @@ public class OrbisSigilStorageModel implements OrbisDepotStorageContext {
 
     @Override
     public void resetUploadTimer() {
-        depotStorageData.resetElapsedTime();
     }
 
     @Override
     public float getUploadProgress() {
-        return depotStorageData.getElapsedTime() / depotStorageData.getTickInterval();
+        return depotStorageData.getUploadProgress();
     }
 
     @Override

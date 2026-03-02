@@ -6,6 +6,7 @@ import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.DepotOwnerUtils;
+import com.destbg.OrbisDepot.Utils.UploadClockUtils;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Store;
@@ -35,9 +36,8 @@ public class DepotTickingSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
-        storage.addElapsedTime(dt);
-        if (storage.getElapsedTime() >= storage.getTickInterval()) {
-            storage.resetElapsedTime();
+        if (UploadClockUtils.shouldUpload(storage.getLastUploadTick(), storage.getTicksPerInterval())) {
+            storage.setLastUploadTick(UploadClockUtils.currentTick());
             var itemContainer = data.getItemContainer();
             DepositUtils.attemptDeposit(itemContainer, storage, storage.getStorageUpgradeRank(), Constants.DEPOT_UPLOAD_SLOT_ADDITIONAL_STACKS);
             OrbisDepotStorageUI.notifyViewersOf(ownerUuid, storage);

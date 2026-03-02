@@ -24,6 +24,11 @@ public final class Constants {
 
     public static final float UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS = 2.0f;
     public static final float UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS = 4.0f;
+
+    public static final long UPLOAD_CLOCK_TICK_MS = 250L;
+
+    public static final long CRUDE_SIGIL_TICKS_PER_UPLOAD =
+            Math.round(UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS * 1000.0 / UPLOAD_CLOCK_TICK_MS);
     public static final short DEPOT_SLOT_CAPACITY = 1;
     public static final short SIGIL_UPLOAD_SLOT_CAPACITY = 4;
     public static final short CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY = 2;

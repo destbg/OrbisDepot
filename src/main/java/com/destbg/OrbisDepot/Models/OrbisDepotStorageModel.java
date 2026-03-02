@@ -64,12 +64,11 @@ public class OrbisDepotStorageModel implements OrbisDepotStorageContext {
 
     @Override
     public void resetUploadTimer() {
-        ownerStorageData.resetElapsedTime();
     }
 
     @Override
     public float getUploadProgress() {
-        return ownerStorageData.getElapsedTime() / ownerStorageData.getTickInterval();
+        return ownerStorageData.getUploadProgress();
     }
 
     @Override

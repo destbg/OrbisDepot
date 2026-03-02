@@ -23,9 +23,6 @@ public class CrudeSigilPlayerData implements Component<EntityStore> {
                         }
                     },
                     s -> s.itemContainer).add()
-            .append(new KeyedCodec<>("ElapsedTime", Codec.FLOAT),
-                    (component, value) -> component.elapsedTime = value,
-                    component -> component.elapsedTime).add()
             .append(new KeyedCodec<>("SelectedAttunement", Codec.UUID_BINARY),
                     (component, value) -> component.selectedAttunement = value,
                     component -> component.selectedAttunement).add()
@@ -33,7 +30,7 @@ public class CrudeSigilPlayerData implements Component<EntityStore> {
 
     private SimpleItemContainer itemContainer;
     private UUID selectedAttunement;
-    private float elapsedTime;
+    private transient long lastUploadTick;
 
     public CrudeSigilPlayerData() {
         itemContainer = new SimpleItemContainer(Constants.CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY);
@@ -41,7 +38,7 @@ public class CrudeSigilPlayerData implements Component<EntityStore> {
 
     public CrudeSigilPlayerData(CrudeSigilPlayerData clone) {
         this.itemContainer = clone.itemContainer;
-        this.elapsedTime = clone.elapsedTime;
+        this.selectedAttunement = clone.selectedAttunement;
     }
 
     public SimpleItemContainer getItemContainer() {
@@ -56,20 +53,12 @@ public class CrudeSigilPlayerData implements Component<EntityStore> {
         this.selectedAttunement = selectedAttunement;
     }
 
-    public float getTickInterval() {
-        return Constants.UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS;
+    public long getLastUploadTick() {
+        return lastUploadTick;
     }
 
-    public float getElapsedTime() {
-        return elapsedTime;
-    }
-
-    public void addElapsedTime(float dt) {
-        this.elapsedTime += dt;
-    }
-
-    public void resetElapsedTime() {
-        this.elapsedTime = 0f;
+    public void setLastUploadTick(long tick) {
+        this.lastUploadTick = tick;
     }
 
     @Nonnull

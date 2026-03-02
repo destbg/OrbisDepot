@@ -2,6 +2,7 @@ package com.destbg.OrbisDepot.Components;
 
 import com.destbg.OrbisDepot.Models.AttunedEntry;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.UploadClockUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +22,7 @@ public class DepotStorageData {
     private float tickInterval;
     private int storageUpgradeRank;
     private int speedUpgradeRank;
-    private transient float elapsedTime;
+    private volatile transient long lastUploadTick;
     private Runnable saveCallback;
 
     public DepotStorageData() {
@@ -120,16 +121,23 @@ public class DepotStorageData {
         }
     }
 
-    public float getElapsedTime() {
-        return elapsedTime;
+    public long getTicksPerInterval() {
+        return Math.max(1L, Math.round(tickInterval * 1000.0 / Constants.UPLOAD_CLOCK_TICK_MS));
     }
 
-    public void addElapsedTime(float dt) {
-        this.elapsedTime += dt;
+    public long getLastUploadTick() {
+        return lastUploadTick;
     }
 
-    public void resetElapsedTime() {
-        this.elapsedTime = 0f;
+    public void setLastUploadTick(long tick) {
+        this.lastUploadTick = tick;
+    }
+
+    public float getUploadProgress() {
+        long tpi = getTicksPerInterval();
+        long now = UploadClockUtils.currentTick();
+        long lastBoundary = (now / tpi) * tpi;
+        return (float) (now - lastBoundary) / tpi;
     }
 
     public Map<String, Integer> getItemContainer() {
