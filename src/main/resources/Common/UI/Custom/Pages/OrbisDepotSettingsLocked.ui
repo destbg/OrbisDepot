@@ -40,7 +40,6 @@ Group {
     Label {
       Text: "Fully restore the Sigil to unlock these capabilities.";
       Style: (FontSize: 12, TextColor: #96a9be, Wrap: true);
-      Anchor: (Width: 256);
     }
   }
 }
