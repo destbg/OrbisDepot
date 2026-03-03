@@ -18,7 +18,6 @@ import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -73,16 +72,7 @@ public class PlaceBlockAutoRestoreSystem extends EntityEventSystem<EntityStore, 
             return;
         }
 
-        World world;
-        try {
-            world = Universe.get().getDefaultWorld();
-        } catch (Exception e) {
-            return;
-        }
-        if (world == null) {
-            return;
-        }
-
+        World world = store.getExternalData().getWorld();
         int quantityBefore = itemInHand.getQuantity();
 
         CompletableFuture.runAsync(() -> {
