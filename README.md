@@ -28,7 +28,7 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 
 [![Auto Replenishing](https://github.com/destbg/OrbisDepot/raw/master/docs/auto_replenish.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/auto_replenish.gif)
 
-### You can take items directly from your Sigil when crafting items
+### You can take items directly from your Sigil when crafting
 
 [![Crafting Integration](https://github.com/destbg/OrbisDepot/raw/master/docs/crafting_integration.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/crafting_integration.gif)
 
