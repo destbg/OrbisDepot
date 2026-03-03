@@ -11,6 +11,7 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 - **Pocket crafting integration**: if you have a Sigil in your inventory, crafting can pull ingredients from void storage.
 - **Auto-replenish placed blocks**: also with Sigil, your placed blocks can be topped up from storage.
 - **Automation-friendly**: designed to play nicely with external storage/network mods.
+- **Progression System**: you can double storage capacity and/or deposit speed thru the Orbis Sigil for Voidhearths.
 
 ## Showcase
 
@@ -31,6 +32,10 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 ### You can take items directly from your Sigil when crafting
 
 [![Crafting Integration](https://github.com/destbg/OrbisDepot/raw/master/docs/crafting_integration.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/crafting_integration.gif)
+
+### Upgrade your speed/storage from your Orbis Sigil
+
+[![Upgrade](https://github.com/destbg/OrbisDepot/raw/master/docs/upgrade.gif)](https://github.com/destbg/OrbisDepot/blob/master/docs/upgrade.gif)
 
 ### Attune other players' Depots to your Sigil and access their storage as well
 
