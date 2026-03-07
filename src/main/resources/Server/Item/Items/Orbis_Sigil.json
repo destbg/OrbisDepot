@@ -31,7 +31,6 @@
       "Spellbook"
     ]
   },
-  "Weapon": {},
   "ItemSoundSetId": "ISS_Weapons_Books",
   "Interactions": {
     "Secondary": {
