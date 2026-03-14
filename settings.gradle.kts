@@ -9,7 +9,7 @@ plugins {
 // Create a folder named "common", then configure details with `common { }`
 
 hytale {
-    usePatchline("release")
+    usePatchline("pre-release")
     useVersion("latest")
 
     repositories {
@@ -22,7 +22,7 @@ hytale {
 
     manifest {
         Group = "destbg"
-        Name = "OrbisDepot"
+        Name = "Orbis Depot"
         Main = "com.destbg.OrbisDepot.Main"
     }
 }

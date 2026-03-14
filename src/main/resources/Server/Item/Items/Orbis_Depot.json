@@ -62,9 +62,10 @@
     "Opacity": "Transparent",
     "ParticleColor": "#461672",
     "State": {
-      "Id": "OrbisDepot",
-      "Capacity": 1,
       "Definitions": {
+        "CloseWindow": {
+          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Close.blockyanim"
+        },
         "OpenWindow": {
           "Particles": [
             {
@@ -74,18 +75,13 @@
               "PositionOffset": {}
             }
           ],
-          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim",
-          "State": {
-            "Definitions": {
-              "CloseWindow": {
-                "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Close.blockyanim"
-              },
-              "OpenWindow": {
-                "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim"
-              }
-            }
-          }
+          "CustomModelAnimation": "Blocks/Animations/Chest/Chest_Open.blockyanim"
         }
+      }
+    },
+    "BlockEntity": {
+      "Components": {
+        "DepotChunkDataComponent": {}
       }
     },
     "Supporting": {
@@ -104,7 +100,6 @@
     },
     "VariantRotation": "NESW",
     "Interactions": {
-      "Primary": "Break_Container",
       "Use": {
         "Interactions": [
           {

@@ -25,7 +25,7 @@ public final class ComponentUtils {
         return sigilPlayerDataComponent;
     }
 
-    public static void setup(ComponentRegistryProxy<EntityStore> entityRegistry) {
+    public static void setup(ComponentRegistryProxy<EntityStore> entityRegistry, ComponentRegistryProxy<ChunkStore> chunkRegistry) {
         crudeSigilPlayerDataComponent = entityRegistry.registerComponent(
                 CrudeSigilPlayerData.class,
                 "CrudeSigilPlayerDataComponent",
@@ -36,11 +36,10 @@ public final class ComponentUtils {
                 "SigilPlayerDataComponent",
                 SigilPlayerData.CODEC
         );
-    }
-
-    @SuppressWarnings("removal")
-    public static void setupDepotChunkDataComponent() {
-        depotPlayerDataComponent = com.hypixel.hytale.server.core.universe.world.meta.BlockStateModule.get()
-                .getComponentType(DepotChunkData.class);
+        depotPlayerDataComponent = chunkRegistry.registerComponent(
+                DepotChunkData.class,
+                "DepotChunkDataComponent",
+                DepotChunkData.CODEC
+        );
     }
 }

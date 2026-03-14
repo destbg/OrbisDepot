@@ -7,10 +7,7 @@ import com.destbg.OrbisDepot.Interactions.CrudeOrbisSigilOpenInteraction;
 import com.destbg.OrbisDepot.Interactions.OrbisDepotAttunementConsumeInteraction;
 import com.destbg.OrbisDepot.Interactions.OrbisDepotOpenInteraction;
 import com.destbg.OrbisDepot.Interactions.OrbisSigilOpenInteraction;
-import com.destbg.OrbisDepot.Components.DepotChunkData;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
-import com.destbg.OrbisDepot.Storage.LegacyDataMigration;
-import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.Systems.CrudeSigilTickingSystem;
 import com.destbg.OrbisDepot.Systems.DepotRefSystem;
 import com.destbg.OrbisDepot.Systems.DepotTickingSystem;
@@ -45,7 +42,7 @@ public class Main extends JavaPlugin {
 
     @Override
     protected void setup() {
-        ComponentUtils.setup(this.getEntityStoreRegistry());
+        ComponentUtils.setup(this.getEntityStoreRegistry(), this.getChunkStoreRegistry());
 
         this.getCodecRegistry(Interaction.CODEC).register(
                 "Crude_Orbis_Sigil_Open",
@@ -71,15 +68,7 @@ public class Main extends JavaPlugin {
 
     @Override
     protected void start() {
-        this.getBlockStateRegistry().registerBlockState(
-                DepotChunkData.class,
-                Constants.ORBIS_DEPOT_STATE_ID,
-                DepotChunkData.CODEC
-        );
-        ComponentUtils.setupDepotChunkDataComponent();
-        LegacyDataMigration.migrateFromRenamedDirectory(getDataDirectory());
         DepotStorageManager.init(getDataDirectory());
-        LegacySlotMigration.init(getDataDirectory());
 
         PermissionsModule.get().addGroupPermission("Adventure", Set.of(
                 Constants.PERM_DEPOT_USE,

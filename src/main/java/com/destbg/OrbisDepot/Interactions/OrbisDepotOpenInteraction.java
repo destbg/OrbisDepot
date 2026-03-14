@@ -4,7 +4,6 @@ import com.destbg.OrbisDepot.Components.DepotChunkData;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Models.OrbisDepotStorageModel;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
-import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.BlockStateUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
@@ -90,17 +89,6 @@ public class OrbisDepotOpenInteraction extends SimpleInstantInteraction {
         }
 
         UUID ownerUUID = depotChunkData.getOwnerUUID();
-        if (ownerUUID == null) {
-            String posKey = targetBlock.x + ":" + targetBlock.y + ":" + targetBlock.z;
-            ownerUUID = LegacySlotMigration.readLegacyDepotOwner(posKey);
-            if (ownerUUID == null) {
-                interactionContext.getState().state = InteractionState.Failed;
-                return;
-            }
-            depotChunkData.setOwnerUUID(ownerUUID);
-            LegacySlotMigration.migrateDepotSlots(posKey, depotChunkData.getItemContainer());
-        }
-
         boolean isOwner = playerRef.getUuid().equals(ownerUUID);
         DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
         boolean isAttuned = myStorage.isAttunedTo(ownerUUID);

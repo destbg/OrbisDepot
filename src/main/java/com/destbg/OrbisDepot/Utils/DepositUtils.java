@@ -26,10 +26,6 @@ public final class DepositUtils {
                 continue;
             }
 
-            if (storage.isStorageFull()) {
-                continue;
-            }
-
             int qty = stack.getQuantity();
 
             if (qty <= 1) {

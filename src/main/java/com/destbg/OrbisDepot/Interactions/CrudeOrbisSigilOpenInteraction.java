@@ -4,7 +4,6 @@ import com.destbg.OrbisDepot.Components.CrudeSigilPlayerData;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Models.CrudeOrbisSigilStorageModel;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
-import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.InventoryUtils;
@@ -78,7 +77,6 @@ public class CrudeOrbisSigilOpenInteraction extends SimpleInstantInteraction {
         if (sigilPlayerData == null) {
             sigilPlayerData = new CrudeSigilPlayerData();
             sigilPlayerData.setSelectedAttunement(playerRef.getUuid());
-            LegacySlotMigration.migrateCrudeSigilSlots(playerRef.getUuid(), sigilPlayerData.getItemContainer());
             commandBuffer.putComponent(ref, CrudeSigilPlayerData.getComponentType(), sigilPlayerData);
         }
 
