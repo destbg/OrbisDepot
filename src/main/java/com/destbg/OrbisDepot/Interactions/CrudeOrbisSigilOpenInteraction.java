@@ -8,6 +8,7 @@ import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -67,7 +68,7 @@ public class CrudeOrbisSigilOpenInteraction extends SimpleInstantInteraction {
         }
 
         if (InventoryUtils.hasOrbisSigil(store, ref)) {
-            player.sendMessage(Message.raw("You cannot use the Crude Orbis Sigil while you have the fully restored version on you.").color("#ff6b6b"));
+            player.sendMessage(Message.raw(TranslationUtils.get("messages.crudeSigil.hasFullSigil")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }

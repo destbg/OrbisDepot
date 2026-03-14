@@ -2,7 +2,6 @@ package com.destbg.OrbisDepot.Systems;
 
 import com.destbg.OrbisDepot.Components.DepotChunkData;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
-import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.DepotOwnerUtils;

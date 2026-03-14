@@ -8,6 +8,7 @@ import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.BlockStateUtils;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Holder;
@@ -93,7 +94,7 @@ public class OrbisDepotOpenInteraction extends SimpleInstantInteraction {
         DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
         boolean isAttuned = myStorage.isAttunedTo(ownerUUID);
         if (!isOwner && !isAttuned) {
-            player.sendMessage(Message.raw("You are not attuned to this Orbis Depot.").color("#ff6b6b"));
+            player.sendMessage(Message.raw(TranslationUtils.get("messages.depot.notAttuned")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }

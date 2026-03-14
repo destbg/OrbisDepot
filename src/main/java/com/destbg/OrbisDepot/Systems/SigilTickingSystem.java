@@ -3,7 +3,6 @@ package com.destbg.OrbisDepot.Systems;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Components.SigilPlayerData;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
-import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.DepotOwnerUtils;
@@ -18,11 +17,10 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-
-import java.util.UUID;
-
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import java.util.UUID;
 
 public class SigilTickingSystem extends EntityTickingSystem<EntityStore> {
     @Override

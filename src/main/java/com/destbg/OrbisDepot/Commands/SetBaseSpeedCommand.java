@@ -25,14 +25,14 @@ public class SetBaseSpeedCommand extends AbstractAsyncCommand {
     protected CompletableFuture<Void> executeAsync(@Nonnull CommandContext context) {
         int value = context.get(ms);
         if (value < Constants.UPLOAD_CLOCK_TICK_MS) {
-            context.sendMessage(Message.raw("Base speed cannot be lower than the tick speed (" + Constants.UPLOAD_CLOCK_TICK_MS + "ms)."));
+            context.sendMessage(Message.raw(TranslationUtils.format("commands.setBasespeed.tooLow", Constants.UPLOAD_CLOCK_TICK_MS)));
             return CompletableFuture.completedFuture(null);
         }
         Constants.UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS = value / 1000.0f;
         DepotStorageManager.get().recomputeAllTickIntervals();
         TranslationUtils.refreshUpgradeDescriptions();
         Main.saveOperatorConfig();
-        context.sendMessage(Message.raw("Base upload speed set to " + value + "ms."));
+        context.sendMessage(Message.raw(TranslationUtils.format("commands.setBasespeed.success", value)));
         return CompletableFuture.completedFuture(null);
     }
 }

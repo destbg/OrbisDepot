@@ -126,7 +126,7 @@ public class Main extends JavaPlugin {
                         .withMetadata(Constants.META_CRAFTER_UUID, Codec.STRING, uuid.toString())
                         .withMetadata(Constants.META_CRAFTER_NAME, Codec.STRING, name);
                 event.getItemContainer().setItemStackForSlot(slot, bound);
-                player.sendMessage(Message.raw("Attunement bound to you. Give it to another player so they can access your Depot.").color("#7bed9f"));
+                player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.created")).color("#7bed9f"));
             });
         });
 

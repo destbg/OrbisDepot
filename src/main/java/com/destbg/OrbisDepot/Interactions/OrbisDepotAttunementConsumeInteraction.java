@@ -3,6 +3,7 @@ package com.destbg.OrbisDepot.Interactions;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -79,7 +80,7 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         String crafterName = heldItem.getFromMetadataOrNull(Constants.META_CRAFTER_NAME, Codec.STRING);
 
         if (crafterUuidStr == null) {
-            player.sendMessage(Message.raw("This attunement hasn't been bound yet.").color("#ffa502"));
+            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.notBound")).color("#ffa502"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -88,13 +89,13 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         try {
             crafterUUID = UUID.fromString(crafterUuidStr);
         } catch (IllegalArgumentException e) {
-            player.sendMessage(Message.raw("This attunement item is corrupted.").color("#ff6b6b"));
+            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.corrupted")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
         if (crafterUUID.equals(myUUID)) {
-            player.sendMessage(Message.raw("You can't attune to your own Depot.").color("#ff6b6b"));
+            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.ownDepot")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -104,7 +105,7 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(myUUID);
 
         if (myStorage.isAttunedTo(crafterUUID)) {
-            player.sendMessage(Message.raw("You are already attuned to " + displayName + "'s Depot.").color("#ffa502"));
+            player.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.alreadyAttuned", displayName)).color("#ffa502"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -119,6 +120,6 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
             hotbar.setItemStackForSlot(activeSlot, heldItem.withQuantity(newQty));
         }
 
-        player.sendMessage(Message.raw("You are now attuned to " + displayName + "'s Orbis Depot!").color("#2ed573"));
+        player.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.success", displayName)).color("#2ed573"));
     }
 }

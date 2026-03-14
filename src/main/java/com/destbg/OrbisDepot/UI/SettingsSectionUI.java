@@ -3,6 +3,7 @@ package com.destbg.OrbisDepot.UI;
 import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -48,16 +49,16 @@ public class SettingsSectionUI {
 
         switch (currentView) {
             case TREE -> {
-                cmd.set("#SettingsTitle.Text", "UPGRADES");
+                cmd.set("#SettingsTitle.Text", TranslationUtils.get("ui.settings.titleUpgrades"));
                 buildUpgradeTree(cmd, evt);
                 buildBackButton(cmd, evt);
             }
             case CONFIRM -> {
-                cmd.set("#SettingsTitle.Text", "UPGRADES");
+                cmd.set("#SettingsTitle.Text", TranslationUtils.get("ui.settings.titleUpgrades"));
                 buildConfirmation(cmd, evt);
             }
             default -> {
-                cmd.set("#SettingsTitle.Text", "SETTINGS");
+                cmd.set("#SettingsTitle.Text", TranslationUtils.get("ui.settings.titleSettings"));
                 buildSettingsView(cmd, evt);
             }
         }
@@ -165,33 +166,34 @@ public class SettingsSectionUI {
         DepotStorageData storage = context.getDepotStorageData();
         long voidhearts = storage.getItemCount(Constants.VOIDHEART_ITEM_ID);
 
+        String typeKey = isStorage ? "ui.settings.storageType" : "ui.settings.speedType";
         String title;
         String desc;
         String costLabel;
         if (isRefund) {
-            title = "Refund " + (isStorage ? "Storage" : "Speed") + " Upgrade " + toRoman(tier);
+            title = TranslationUtils.format("ui.settings.refundTitle", TranslationUtils.get(typeKey), toRoman(tier));
             if (isStorage) {
                 int toStacks = Constants.STORAGE_RANK_MULTIPLIERS[tier - 1];
                 int fromStacks = Constants.STORAGE_RANK_MULTIPLIERS[tier];
-                desc = "Downgrade capacity from " + fromStacks + " to " + toStacks + " stacks per item";
+                desc = TranslationUtils.format("ui.settings.downgradeStorageDesc", fromStacks, toStacks);
             } else {
                 int fromRate = itemsPerMinPerSlot(tier + 1);
                 int toRate = itemsPerMinPerSlot(tier);
-                desc = "Downgrade deposit speed from " + fromRate + " to " + toRate + " items/slot/min";
+                desc = TranslationUtils.format("ui.settings.downgradeSpeedDesc", fromRate, toRate);
             }
-            costLabel = "Refund: " + cost + " Voidheart" + (cost != 1 ? "s" : "");
+            costLabel = TranslationUtils.format(cost != 1 ? "ui.settings.refundPlural" : "ui.settings.refundSingular", cost);
         } else {
-            title = (isStorage ? "Storage" : "Speed") + " Upgrade " + toRoman(tier);
+            title = TranslationUtils.format("ui.settings.upgradeTitle", TranslationUtils.get(typeKey), toRoman(tier));
             if (isStorage) {
                 int fromStacks = Constants.STORAGE_RANK_MULTIPLIERS[tier - 1];
                 int toStacks = Constants.STORAGE_RANK_MULTIPLIERS[tier];
-                desc = "Upgrade capacity from " + fromStacks + " to " + toStacks + " stacks per item";
+                desc = TranslationUtils.format("ui.settings.upgradeStorageDesc", fromStacks, toStacks);
             } else {
                 int fromRate = itemsPerMinPerSlot(tier);
                 int toRate = itemsPerMinPerSlot(tier + 1);
-                desc = "Upgrade deposit speed from " + fromRate + " to " + toRate + " items/slot/min";
+                desc = TranslationUtils.format("ui.settings.upgradeSpeedDesc", fromRate, toRate);
             }
-            costLabel = "Cost: " + cost + " Voidheart" + (cost != 1 ? "s" : "");
+            costLabel = TranslationUtils.format(cost != 1 ? "ui.settings.costPlural" : "ui.settings.costSingular", cost);
         }
 
         cmd.append("#SettingsPanel", "Pages/OrbisDepotUpgradeConfirm.ui");
@@ -199,7 +201,7 @@ public class SettingsSectionUI {
         cmd.set("#ConfirmTitle.Text", title);
         cmd.set("#ConfirmDesc.Text", desc);
         cmd.set("#ConfirmCost.Text", costLabel);
-        cmd.set("#ConfirmAvailable.Text", "Available: " + voidhearts);
+        cmd.set("#ConfirmAvailable.Text", TranslationUtils.format("ui.settings.available", voidhearts));
 
         if (isRefund) {
             evt.addEventBinding(CustomUIEventBindingType.Activating, "#ConfirmBtn",
@@ -214,7 +216,7 @@ public class SettingsSectionUI {
 
     private void buildBackButton(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
         cmd.append("#UpgradeArea", "Pages/OrbisDepotUpgradeButton.ui");
-        cmd.set("#UpgradeBtnLabel.Text", "Back to Settings");
+        cmd.set("#UpgradeBtnLabel.Text", TranslationUtils.get("ui.settings.backToSettings"));
         evt.addEventBinding(CustomUIEventBindingType.Activating, "#UpgradeOpenBtn",
                 EventData.of(Constants.KEY_ACTION, "upgrade-back"), false);
     }
@@ -230,9 +232,9 @@ public class SettingsSectionUI {
             return;
         }
         evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#AutoPlaceToggle #CheckBox",
-                EventData.of(Constants.KEY_CHECKBOX, Constants.CHECKBOX_AUTO_PLACE), false);
+                EventData.of(Constants.KEY_CHECKBOX, "AutoPlace"), false);
         evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#CraftingToggle #CheckBox",
-                EventData.of(Constants.KEY_CHECKBOX, Constants.CHECKBOX_CRAFTING), false);
+                EventData.of(Constants.KEY_CHECKBOX, "Crafting"), false);
     }
 
     public void handleCheckbox(@Nonnull String checkboxId) {
@@ -240,8 +242,8 @@ public class SettingsSectionUI {
             return;
         }
         switch (checkboxId) {
-            case Constants.CHECKBOX_AUTO_PLACE -> context.setAutoRestore(!context.isAutoRestoreEnabled());
-            case Constants.CHECKBOX_CRAFTING -> context.setCraftingIntegration(!context.isCraftingIntegrationEnabled());
+            case "AutoPlace" -> context.setAutoRestore(!context.isAutoRestoreEnabled());
+            case "Crafting" -> context.setCraftingIntegration(!context.isCraftingIntegrationEnabled());
         }
     }
 
