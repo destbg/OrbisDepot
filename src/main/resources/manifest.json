@@ -1,22 +1,22 @@
 {
-  "Group": "destbg",
-  "Name": "Orbis Depot",
-  "Version": "4.0.0",
-  "Description": "Orbis Depot adds a dynamic dimensional storage system to Hytale",
-  "Authors": [
-    {
-      "Name": "destbg",
-      "Email": "",
-      "Url": "https://github.com/destbg"
-    }
-  ],
-  "Website": "https://github.com/destbg/OrbisDepot",
-  "Main": "com.destbg.OrbisDepot.Main",
-  "ServerVersion": "2026.03.12-b1f856309",
-  "Dependencies": {},
-  "OptionalDependencies": {},
-  "LoadBefore": {},
-  "DisabledByDefault": false,
-  "IncludesAssetPack": true,
-  "SubPlugins": []
+    "Group": "destbg",
+    "Name": "Orbis Depot",
+    "Version": "4.0.0",
+    "Description": "Orbis Depot adds a dynamic dimensional storage system to Hytale",
+    "Authors": [
+        {
+            "Name": "destbg",
+            "Email": "",
+            "Url": "https://github.com/destbg"
+        }
+    ],
+    "Website": "https://github.com/destbg/OrbisDepot",
+    "DisabledByDefault": false,
+    "IncludesAssetPack": true,
+    "Dependencies": {},
+    "OptionalDependencies": {},
+    "LoadBefore": {},
+    "ServerVersion": "2026.03.12-b1f856309",
+    "Main": "com.destbg.OrbisDepot.Main",
+    "SubPlugins": []
 }

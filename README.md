@@ -49,13 +49,17 @@ Hytale has a lot of items, have you ever tried collecting some of them on your j
 
 ### Item stacks per upgrade
 The item stacks each upgrade of the Orbis Depot gives are configured thru the `/orbisdepot set-upgrade-stacks`.
-It accepts an array of multipliers with the default being `/orbisdepot set-upgrade-stacks [2,5,10,20]`.
+It accepts an array of multipliers with the default being `/orbisdepot set-upgrade-stacks 2,5,10,20`.
 The values take into account the base stack size for that item, if the item has a base stack size of 20, then with a upgraded multiplier of 5, you will be able to upload 100 of that item thru the Orbis Depot and 120 thru the Orbis Sigil (the Orbis Sigil always gives + 1 stack to the total to avoid players throwing items away when they have a full storage because their Orbis Depot's has that item automated).
+
+The Voidheart cost for each storage upgrade tier is configured thru `/orbisdepot set-upgrade-storage-cost`, with the default being `/orbisdepot set-upgrade-storage-cost 2,4,8,32`.
 
 ### Item upload speed per upgrade
 The item upload speed boost each upgrade gives to the Orbis Depot are configured thru the `/orbisdepot set-upgrade-speed`.
-It accepts an array of numbers where each divides the base speed of 2 seconds with the default being `/orbisdepot set-upgrade-speed [2,3,4,8]`.
+It accepts an array of numbers where each divides the base speed of 2 seconds with the default being `/orbisdepot set-upgrade-speed 2,3,4,8`.
 Keep in mind that the fastest possible speed is 250 milliseconds per upload, if you set a tier to be higher than the value 8 (since 2 seconds / 8 = 250 milliseconds), then it simply won't register.
+
+The Voidheart cost for each speed upgrade tier is configured thru `/orbisdepot set-upgrade-speed-cost`, with the default being `/orbisdepot set-upgrade-speed-cost 4,8,16,64`.
 
 ### Set how often the mod performs an update
 I recommend to not set this value to a anything below 250 milliseconds, Hytale can only handle 1 action per tick, meaning that any update made by the user (such as clicking item slots to take/deposit items) can only happen if in a span of 33 milliseconds there wasn't another update sent to the client by the server. In other words by setting the update speed to 33 milliseconds (the lowest value), then the user won't be able to do anything inside the Orbis Depot's UI while a deposit is in progress.

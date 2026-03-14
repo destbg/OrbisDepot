@@ -98,6 +98,10 @@ public class DepotStorageData {
         save();
     }
 
+    public void recomputeTickInterval() {
+        this.tickInterval = computeTickInterval(speedUpgradeRank);
+    }
+
     private static float computeTickInterval(int speedRank) {
         int idx = Math.min(speedRank - 1, Constants.SPEED_RANK_DIVISORS.length - 1);
         return Constants.UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS / Constants.SPEED_RANK_DIVISORS[idx];

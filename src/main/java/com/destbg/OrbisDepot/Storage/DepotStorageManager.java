@@ -83,6 +83,10 @@ public final class DepotStorageManager {
         }
     }
 
+    public void recomputeAllTickIntervals() {
+        players.values().forEach(DepotStorageData::recomputeTickInterval);
+    }
+
     public void saveAll() {
         for (UUID uuid : players.keySet()) {
             save(uuid);
