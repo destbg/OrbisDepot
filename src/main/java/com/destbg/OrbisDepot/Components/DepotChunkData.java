@@ -5,54 +5,41 @@ import com.destbg.OrbisDepot.Utils.Constants;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.event.EventPriority;
-import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
-import com.hypixel.hytale.server.core.universe.world.meta.state.ItemContainerState;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
-public class DepotChunkData extends ItemContainerState {
+public class DepotChunkData implements Component<ChunkStore> {
 
     public static final BuilderCodec<DepotChunkData> CODEC = BuilderCodec.builder(DepotChunkData.class, DepotChunkData::new)
-            .append(new KeyedCodec<>("ItemContainer", SimpleItemContainer.CODEC),
-                    (state, container) -> {
-                        if (container != null) {
-                            state.itemContainer = container;
-                        }
-                    },
-                    s -> s.itemContainer).add()
-            .append(new KeyedCodec<>("OwnerUUID", Codec.UUID_STRING),
+            .appendInherited(new KeyedCodec<>("ItemContainer", SimpleItemContainer.CODEC),
+                    (state, container) -> { if (container != null) { state.itemContainer = container; } },
+                    s -> s.itemContainer,
+                    (o, p) -> { if (p.itemContainer != null) { o.itemContainer = p.itemContainer.clone(); } }).add()
+            .appendInherited(new KeyedCodec<>("OwnerUUID", Codec.UUID_STRING),
                     (state, uuid) -> state.ownerUUID = uuid,
-                    state -> state.ownerUUID).add()
+                    state -> state.ownerUUID,
+                    (o, p) -> o.ownerUUID = p.ownerUUID).add()
             .build();
 
+    private SimpleItemContainer itemContainer;
     private UUID ownerUUID;
 
-    @Override
-    public boolean initialize(@NonNullDecl BlockType blockType) {
-        boolean result = super.initialize(blockType);
-        if (!result) {
-            return false;
-        }
-        ItemContainer current = getItemContainer();
-        if (current != null && current.getCapacity() != Constants.DEPOT_SLOT_CAPACITY) {
-            SimpleItemContainer resized = new SimpleItemContainer(Constants.DEPOT_SLOT_CAPACITY);
-            for (short i = 0; i < Math.min(current.getCapacity(), Constants.DEPOT_SLOT_CAPACITY); i++) {
-                ItemStack stack = current.getItemStack(i);
-                if (stack != null && !ItemStack.isEmpty(stack)) {
-                    resized.setItemStackForSlot(i, stack);
-                }
-            }
-            super.itemContainer = resized;
-            resized.registerChangeEvent(EventPriority.LAST, this::onItemChange);
-        }
-        return true;
+    public DepotChunkData() {
+        itemContainer = new SimpleItemContainer(Constants.DEPOT_SLOT_CAPACITY);
+    }
+
+    private DepotChunkData(DepotChunkData clone) {
+        this.itemContainer = clone.itemContainer;
+        this.ownerUUID = clone.ownerUUID;
+    }
+
+    public SimpleItemContainer getItemContainer() {
+        return itemContainer;
     }
 
     public UUID getOwnerUUID() {
@@ -61,6 +48,12 @@ public class DepotChunkData extends ItemContainerState {
 
     public void setOwnerUUID(UUID ownerUUID) {
         this.ownerUUID = ownerUUID;
+    }
+
+    @Nonnull
+    @Override
+    public Component<ChunkStore> clone() {
+        return new DepotChunkData(this);
     }
 
     public static ComponentType<ChunkStore, DepotChunkData> getComponentType() {

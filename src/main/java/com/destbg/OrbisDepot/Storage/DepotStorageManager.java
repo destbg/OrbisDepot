@@ -41,7 +41,6 @@ public final class DepotStorageManager {
     }
 
     public static void init(@Nonnull Path dataDirectory) {
-        LegacyDataMigration.migrateIfNeeded(dataDirectory);
         instance = new DepotStorageManager(dataDirectory);
         instance.loadAll();
     }
@@ -119,8 +118,8 @@ public final class DepotStorageManager {
                 return;
             }
 
-            int storageRank = record.storageUpgradeRank() > 0 ? record.storageUpgradeRank() : 1;
-            int speedRank = record.speedUpgradeRank() > 0 ? record.speedUpgradeRank() : 1;
+            int storageRank = Math.min(record.storageUpgradeRank(), 1);
+            int speedRank = Math.min(record.speedUpgradeRank(), 1);
             DepotStorageData data = new DepotStorageData(
                     record.itemContainer() != null ? record.itemContainer() : new HashMap<>(),
                     record.attunedToOthers() != null ? record.attunedToOthers() : new HashMap<>(),

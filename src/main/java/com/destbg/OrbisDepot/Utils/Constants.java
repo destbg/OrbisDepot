@@ -45,7 +45,6 @@ public final class Constants {
     public static final String META_CRAFTER_NAME = "orbis_crafter_name";
 
     public static final String VOIDHEART_ITEM_ID = "Ingredient_Voidheart";
-    public static final int BASE_STORAGE_CAPACITY = 10_000;
     public static final int MAX_UPGRADE_RANK = 5;
     public static final int[] STORAGE_RANK_MULTIPLIERS = {1, 2, 5, 10, 20};
     public static final int[] SPEED_RANK_DIVISORS = {1, 2, 3, 4, 8};
@@ -57,8 +56,6 @@ public final class Constants {
     public static final String[] UPGRADE_SPEED_ITEM_IDS = {
             "OrbisUpgradeSpeed1", "OrbisUpgradeSpeed2", "OrbisUpgradeSpeed3", "OrbisUpgradeSpeed4"
     };
-
-    public static final String ORBIS_DEPOT_STATE_ID = "OrbisDepot";
 
     public static final String SIGIL_ANIM_SET = "OrbisSpellbook";
     public static final String SIGIL_OPEN_ANIM = "CastSigilOpen";

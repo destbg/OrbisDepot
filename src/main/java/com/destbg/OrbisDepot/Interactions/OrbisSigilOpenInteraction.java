@@ -4,7 +4,6 @@ import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Components.SigilPlayerData;
 import com.destbg.OrbisDepot.Models.OrbisSigilStorageModel;
 import com.destbg.OrbisDepot.Storage.DepotStorageManager;
-import com.destbg.OrbisDepot.Storage.LegacySlotMigration;
 import com.destbg.OrbisDepot.UI.OrbisDepotStorageUI;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.SoundUtils;
@@ -70,7 +69,6 @@ public class OrbisSigilOpenInteraction extends SimpleInstantInteraction {
         if (sigilPlayerData == null) {
             sigilPlayerData = new SigilPlayerData();
             sigilPlayerData.setSelectedAttunement(playerRef.getUuid());
-            LegacySlotMigration.migrateSigilSlots(playerRef.getUuid(), sigilPlayerData.getItemContainer());
             commandBuffer.putComponent(ref, SigilPlayerData.getComponentType(), sigilPlayerData);
         }
 

@@ -64,15 +64,6 @@ public class DepotStorageData {
         return speedUpgradeRank;
     }
 
-    public int getMaxStorageItems() {
-        int idx = Math.min(storageUpgradeRank - 1, Constants.STORAGE_RANK_MULTIPLIERS.length - 1);
-        return Constants.BASE_STORAGE_CAPACITY * Constants.STORAGE_RANK_MULTIPLIERS[idx];
-    }
-
-    public boolean isStorageFull() {
-        return getTotalItemCount() >= getMaxStorageItems();
-    }
-
     public void upgradeStorageCapacity() {
         if (storageUpgradeRank >= Constants.MAX_UPGRADE_RANK) {
             return;
@@ -110,15 +101,6 @@ public class DepotStorageData {
     private static float computeTickInterval(int speedRank) {
         int idx = Math.min(speedRank - 1, Constants.SPEED_RANK_DIVISORS.length - 1);
         return Constants.UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS / Constants.SPEED_RANK_DIVISORS[idx];
-    }
-
-    public int getTotalItemCount() {
-        lock.readLock().lock();
-        try {
-            return itemContainer.values().stream().mapToInt(Integer::intValue).sum();
-        } finally {
-            lock.readLock().unlock();
-        }
     }
 
     public long getTicksPerInterval() {
@@ -172,21 +154,13 @@ public class DepotStorageData {
     }
 
     public void addItem(@Nonnull String itemId, int count) {
-        int actualAdded;
         lock.writeLock().lock();
         try {
-            int currentTotal = itemContainer.values().stream().mapToInt(Integer::intValue).sum();
-            int space = Math.max(0, getMaxStorageItems() - currentTotal);
-            actualAdded = Math.min(count, space);
-            if (actualAdded > 0) {
-                itemContainer.put(itemId, itemContainer.getOrDefault(itemId, 0) + actualAdded);
-            }
+            itemContainer.put(itemId, itemContainer.getOrDefault(itemId, 0) + count);
         } finally {
             lock.writeLock().unlock();
         }
-        if (actualAdded > 0) {
-            save();
-        }
+        save();
     }
 
     public void removeItems(@Nonnull String itemId, int count) {

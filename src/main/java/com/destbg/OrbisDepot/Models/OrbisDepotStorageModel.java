@@ -27,29 +27,20 @@ public class OrbisDepotStorageModel implements OrbisDepotStorageContext {
         this.location = location;
     }
 
-    @SuppressWarnings("deprecation")
-    private DepotChunkData getLiveData() {
-        DepotChunkData state = (DepotChunkData) world.getState(location.getX(), location.getY(), location.getZ(), true);
-        if (state != null) {
-            return state;
-        }
-        return depotChunkData;
-    }
-
     @NonNullDecl
     @Override
     public ItemContainer getUploadSlotContainer() {
-        return getLiveData().getItemContainer();
+        return depotChunkData.getItemContainer();
     }
 
     @Override
     public UUID getSavedAttunement() {
-        return getLiveData().getOwnerUUID();
+        return depotChunkData.getOwnerUUID();
     }
 
     @Override
     public void setSavedAttunement(@Nullable UUID uuid) {
-        getLiveData().setOwnerUUID(uuid);
+        depotChunkData.setOwnerUUID(uuid);
     }
 
     @Override
