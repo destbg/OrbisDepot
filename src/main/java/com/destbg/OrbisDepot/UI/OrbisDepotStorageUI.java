@@ -11,9 +11,8 @@ import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.entity.AnimationUtils;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -178,18 +177,10 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
     }
 
     private void registerInventoryChangeEvents(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store) {
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return;
-        }
-
-        ItemContainer storage = inv.getStorage();
-        ItemContainer hotbar = inv.getHotbar();
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        ItemContainer storage = storageComp != null ? storageComp.getInventory() : null;
+        ItemContainer hotbar = hotbarComp != null ? hotbarComp.getInventory() : null;
 
         if (storage != null) {
             storage.registerChangeEvent(_ -> onInventoryChanged());

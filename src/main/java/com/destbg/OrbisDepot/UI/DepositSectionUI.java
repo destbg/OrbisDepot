@@ -7,8 +7,7 @@ import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -91,17 +90,18 @@ public class DepositSectionUI {
             String nowId = stack.getItemId();
             int nowQty = stack.getQuantity();
             String sel = "#DepositSlots[" + i + "]";
+            String quantityText = nowQty > 1 ? String.valueOf(nowQty) : "";
             if (!nowId.equals(lastItemIds[i])) {
                 lastOccupied[i] = true;
                 lastItemIds[i] = nowId;
                 lastQuantities[i] = nowQty;
                 cmd.set(sel + " #Slot.ItemId", nowId);
-                cmd.set(sel + " #QuantityLabel.Text", nowQty > 1 ? String.valueOf(nowQty) : "");
+                cmd.set(sel + " #QuantityLabel.Text", quantityText);
                 evt.addEventBinding(CustomUIEventBindingType.Activating, sel + " #SlotButton", EventData.of(Constants.KEY_ACTION, "cancel-upload:" + i));
                 changed = true;
             } else if (nowQty != lastQuantities[i]) {
                 lastQuantities[i] = nowQty;
-                cmd.set(sel + " #QuantityLabel.Text", nowQty > 1 ? String.valueOf(nowQty) : "");
+                cmd.set(sel + " #QuantityLabel.Text", quantityText);
                 changed = true;
             }
         }
@@ -120,20 +120,7 @@ public class DepositSectionUI {
             return;
         }
 
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return;
-        }
-
-        ItemContainer playerInv = inv.getCombinedHotbarFirst();
-        if (playerInv == null) {
-            return;
-        }
+        ItemContainer playerInv = InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST);
 
         if (slotIndex < 0 || slotIndex >= playerInv.getCapacity()) {
             return;
@@ -212,20 +199,7 @@ public class DepositSectionUI {
             return;
         }
 
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return;
-        }
-
-        ItemContainer playerInv = inv.getCombinedHotbarFirst();
-        if (playerInv == null) {
-            return;
-        }
+        ItemContainer playerInv = InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST);
 
         ItemContainer depositSlots = context.getUploadSlotContainer();
         if (depositSlotIndex < 0 || depositSlotIndex >= depositSlots.getCapacity()) {

@@ -4,8 +4,7 @@ import com.destbg.OrbisDepot.Utils.Constants;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -18,20 +17,7 @@ public class InventorySectionUI {
 
     public void build(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl UICommandBuilder cmd, @NonNullDecl UIEventBuilder evt, @NonNullDecl Store<EntityStore> store) {
         cmd.clear("#PlayerInventoryCards");
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return;
-        }
-
-        ItemContainer combined = inv.getCombinedHotbarFirst();
-        if (combined == null) {
-            return;
-        }
+        ItemContainer combined = InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST);
 
         short invCap = combined.getCapacity();
         int displaySlots = Math.clamp(invCap, 0, Constants.PLAYER_INVENTORY_DISPLAY_SLOTS);

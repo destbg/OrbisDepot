@@ -52,7 +52,7 @@ public final class CraftingUtils {
             }
 
             Player player = store.getComponent(ref, Player.getComponentType());
-            if (player == null || !InventoryUtils.hasOrbisSigil(player.getInventory())) {
+            if (player == null || !InventoryUtils.hasOrbisSigil(store, ref)) {
                 return;
             }
 
@@ -100,7 +100,7 @@ public final class CraftingUtils {
                 }
 
                 Player player = store.getComponent(ref, Player.getComponentType());
-                if (player == null || !InventoryUtils.hasOrbisSigil(player.getInventory())) {
+                if (player == null || !InventoryUtils.hasOrbisSigil(store, ref)) {
                     return;
                 }
 
@@ -163,7 +163,7 @@ public final class CraftingUtils {
                 }
 
                 Player player = playerStore.getComponent(playerEntity, Player.getComponentType());
-                if (player == null || !InventoryUtils.hasOrbisSigil(player.getInventory())) {
+                if (player == null || !InventoryUtils.hasOrbisSigil(playerStore, playerEntity)) {
                     return;
                 }
 

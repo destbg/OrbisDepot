@@ -12,9 +12,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -77,26 +76,17 @@ public class PlaceBlockAutoRestoreSystem extends EntityEventSystem<EntityStore, 
 
         CompletableFuture.runAsync(() -> {
             try {
-                Player player = store.getComponent(ref, Player.getComponentType());
-                if (player == null) {
+                if (!InventoryUtils.hasOrbisSigil(store, ref)) {
                     return;
                 }
 
-                Inventory inv = player.getInventory();
-                if (inv == null) {
+                InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+                if (hotbarComp == null) {
                     return;
                 }
 
-                if (!InventoryUtils.hasOrbisSigil(inv)) {
-                    return;
-                }
-
-                ItemContainer hotbar = inv.getHotbar();
-                if (hotbar == null) {
-                    return;
-                }
-
-                byte activeSlot = inv.getActiveHotbarSlot();
+                ItemContainer hotbar = hotbarComp.getInventory();
+                byte activeSlot = hotbarComp.getActiveSlot();
                 ItemStack currentStack = (activeSlot >= 0 && activeSlot < hotbar.getCapacity())
                         ? hotbar.getItemStack(activeSlot) : null;
                 int currentQty = (currentStack != null && !ItemStack.isEmpty(currentStack)

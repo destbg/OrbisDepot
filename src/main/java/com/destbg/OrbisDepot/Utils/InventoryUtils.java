@@ -1,8 +1,11 @@
 package com.destbg.OrbisDepot.Utils;
 
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nullable;
 
@@ -44,14 +47,15 @@ public final class InventoryUtils {
         return giveToPlayer(playerInv, itemStack.getItemId(), toGive, additionalStacks);
     }
 
-    public static boolean hasOrbisSigil(@Nullable Inventory inv) {
-        if (inv == null) {
+    public static boolean hasOrbisSigil(@Nullable Store<EntityStore> store, @Nullable Ref<EntityStore> ref) {
+        if (store == null || ref == null) {
             return false;
         }
-        if (containerContains(inv.getCombinedHotbarFirst(), Constants.SIGIL_ITEM_ID)) {
+        if (containerContains(InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST), Constants.SIGIL_ITEM_ID)) {
             return true;
         }
-        return containerContains(inv.getBackpack(), Constants.SIGIL_ITEM_ID);
+        InventoryComponent.Backpack backpack = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+        return containerContains(backpack != null ? backpack.getInventory() : null, Constants.SIGIL_ITEM_ID);
     }
 
     private static boolean containerContains(@Nullable ItemContainer container, String itemId) {

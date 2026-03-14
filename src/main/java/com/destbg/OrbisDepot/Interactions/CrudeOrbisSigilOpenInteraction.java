@@ -66,7 +66,7 @@ public class CrudeOrbisSigilOpenInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        if (InventoryUtils.hasOrbisSigil(player.getInventory())) {
+        if (InventoryUtils.hasOrbisSigil(store, ref)) {
             player.sendMessage(Message.raw("You cannot use the Crude Orbis Sigil while you have the fully restored version on you.").color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
