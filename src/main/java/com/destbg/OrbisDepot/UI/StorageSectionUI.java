@@ -8,8 +8,7 @@ import com.destbg.OrbisDepot.Utils.InventoryUtils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -121,20 +120,7 @@ public class StorageSectionUI {
     }
 
     public void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem) {
-        Player player = store.getComponent(ref, Player.getComponentType());
-        if (player == null) {
-            return;
-        }
-
-        Inventory inv = player.getInventory();
-        if (inv == null) {
-            return;
-        }
-
-        ItemContainer playerInv = inv.getCombinedHotbarFirst();
-        if (playerInv == null) {
-            return;
-        }
+        ItemContainer playerInv = InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST);
 
         long available = depotStorage.getItemCount(itemId);
         if (available <= 0) {

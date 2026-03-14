@@ -13,7 +13,7 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
@@ -52,15 +52,15 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
             return;
         }
 
-        Inventory inv = player.getInventory();
-        if (inv == null) {
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp == null) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
-        ItemContainer hotbar = inv.getHotbar();
-        byte activeSlot = inv.getActiveHotbarSlot();
-        if (hotbar == null || activeSlot < 0 || activeSlot >= hotbar.getCapacity()) {
+        ItemContainer hotbar = hotbarComp.getInventory();
+        byte activeSlot = hotbarComp.getActiveSlot();
+        if (activeSlot < 0 || activeSlot >= hotbar.getCapacity()) {
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
