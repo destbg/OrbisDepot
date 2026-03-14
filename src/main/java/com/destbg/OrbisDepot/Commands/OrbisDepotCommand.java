@@ -1,31 +1,17 @@
 package com.destbg.OrbisDepot.Commands;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
 
-public class OrbisDepotCommand extends AbstractPlayerCommand {
+public class OrbisDepotCommand extends AbstractCommandCollection {
+
     public OrbisDepotCommand() {
-        super("orbisdepot", "");
-    }
-
-    @Override
-    protected void execute(@NonNullDecl CommandContext commandContext, @NonNullDecl Store<EntityStore> store, @NonNullDecl Ref<EntityStore> ref, @NonNullDecl PlayerRef playerRef, @NonNullDecl World world) {
-        Player player = store.getComponent(ref, Player.getComponentType());
-        UUIDComponent component = store.getComponent(ref, UUIDComponent.getComponentType());
-        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
-        player.sendMessage(Message.raw("Player#getUuid() : " + player.getUuid()));
-        player.sendMessage(Message.raw("UUIDComponent : " + component.getUuid()));
-        player.sendMessage(Message.raw("equal : " + player.getUuid().equals(component.getUuid())));
-        player.sendMessage(Message.raw("Transform : " + transform.getPosition()));
+        super("orbisdepot", "Operator configuration for the Orbis Depot mod.");
+        addSubCommand(new SetUpgradeStacksCommand());
+        addSubCommand(new SetUpgradeStorageCostCommand());
+        addSubCommand(new SetUpgradeSpeedCommand());
+        addSubCommand(new SetUpgradeSpeedCostCommand());
+        addSubCommand(new SetTickSpeedCommand());
+        addSubCommand(new SetBaseSpeedCommand());
+        addSubCommand(new SetCrudeBaseSpeedCommand());
     }
 }

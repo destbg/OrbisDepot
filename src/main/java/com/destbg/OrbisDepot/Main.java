@@ -1,5 +1,7 @@
 package com.destbg.OrbisDepot;
 
+import com.destbg.OrbisDepot.Commands.OrbisDepotCommand;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.destbg.OrbisDepot.Crafting.OrbisFieldCraftingWindow;
 import com.destbg.OrbisDepot.Crafting.PlaceBlockAutoRestoreSystem;
 import com.destbg.OrbisDepot.Crafting.UseBlockCraftingSystem;
@@ -30,18 +32,29 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.Config;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.util.Set;
 import java.util.UUID;
 
 public class Main extends JavaPlugin {
+    private static Config<OrbisDepotConfig> operatorConfig;
+
     public Main(@NonNullDecl JavaPluginInit init) {
         super(init);
+        operatorConfig = this.withConfig("OrbisDepotConfig", OrbisDepotConfig.CODEC);
+    }
+
+    public static void saveOperatorConfig() {
+        operatorConfig.get().readFromConstants();
+        operatorConfig.save();
     }
 
     @Override
     protected void setup() {
+        operatorConfig.get().applyToConstants();
+
         ComponentUtils.setup(this.getEntityStoreRegistry(), this.getChunkStoreRegistry());
 
         this.getCodecRegistry(Interaction.CODEC).register(
@@ -69,6 +82,8 @@ public class Main extends JavaPlugin {
     @Override
     protected void start() {
         DepotStorageManager.init(getDataDirectory());
+        this.getCommandRegistry().registerCommand(new OrbisDepotCommand());
+        TranslationUtils.refreshUpgradeDescriptions();
 
         PermissionsModule.get().addGroupPermission("Adventure", Set.of(
                 Constants.PERM_DEPOT_USE,
