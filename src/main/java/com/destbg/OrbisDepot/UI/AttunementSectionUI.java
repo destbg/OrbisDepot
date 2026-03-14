@@ -4,6 +4,7 @@ import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Models.AttunedEntry;
 import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -79,11 +80,11 @@ public class AttunementSectionUI {
     }
 
     private void buildConfirmation(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
-        String name = pendingTargetName != null ? pendingTargetName : "this player";
+        String name = pendingTargetName != null ? pendingTargetName : TranslationUtils.get("ui.attunement.thisPlayer");
         boolean isLeave = pendingType == ConfirmationType.LEAVE;
 
-        String prompt = isLeave ? "Leave depot of" : "Remove access for";
-        String confirmLabel = isLeave ? "Yes, Leave" : "Yes, Remove";
+        String prompt = isLeave ? TranslationUtils.get("ui.attunement.leavePrompt") : TranslationUtils.get("ui.attunement.removePrompt");
+        String confirmLabel = isLeave ? TranslationUtils.get("ui.attunement.confirmLeave") : TranslationUtils.get("ui.attunement.confirmRemove");
         String confirmAction = isLeave ? "confirm-leave" : "confirm-revoke";
         String cancelAction = isLeave ? "cancel-leave" : "cancel-revoke";
 
@@ -106,7 +107,7 @@ public class AttunementSectionUI {
         cmd.appendInline("#AttunementPanel",
                 "Button #CancelBtn { Anchor: (Height: 28, Left: 16, Right: 16);"
                         + " Style: (Default: (Background: #2b3a4a), Hovered: (Background: #3a4d60), Pressed: (Background: #1f2d3a));"
-                        + " Label { Text: \"Cancel\"; Style: (FontSize: 13, TextColor: #c8d6e5, HorizontalAlignment: Center, VerticalAlignment: Center); } }");
+                        + " Label { Text: \"" + TranslationUtils.get("ui.attunement.cancel") + "\"; Style: (FontSize: 13, TextColor: #c8d6e5, HorizontalAlignment: Center, VerticalAlignment: Center); } }");
         evt.addEventBinding(CustomUIEventBindingType.Activating, "#CancelBtn",
                 EventData.of(Constants.KEY_ACTION, cancelAction), false);
     }
@@ -124,7 +125,7 @@ public class AttunementSectionUI {
 
             cmd.append("#AttunementPanel", "Pages/OrbisDepotAttunementEntry.ui");
 
-            String label = entry.ownerUUID().equals(playerUUID) ? "My Depot" : entry.ownerName();
+            String label = entry.ownerUUID().equals(playerUUID) ? TranslationUtils.get("ui.attunement.myDepot") : entry.ownerName();
             boolean isSelected = entry.ownerUUID().equals(selectedOwnerUUID);
 
             cmd.set(sel + " #AttunementCheckbox #CheckBox.Value", isSelected);
@@ -141,7 +142,7 @@ public class AttunementSectionUI {
             cmd.appendInline("#AttunementPanel",
                     "Button #LeaveDepotBtn { Anchor: (Height: 24, Left: 16, Right: 16);"
                             + " Style: (Default: (Background: #3a2b2b), Hovered: (Background: #4a3535), Pressed: (Background: #2e2222));"
-                            + " Label { Text: \"Leave " + selectedName.replace("\"", "'") + "'s Depot\"; Style: (FontSize: 12, TextColor: #e07070, HorizontalAlignment: Center, VerticalAlignment: Center); } }");
+                            + " Label { Text: \"" + TranslationUtils.format("ui.attunement.leaveButton", selectedName.replace("\"", "'")) + "\"; Style: (FontSize: 12, TextColor: #e07070, HorizontalAlignment: Center, VerticalAlignment: Center); } }");
             evt.addEventBinding(CustomUIEventBindingType.Activating, "#LeaveDepotBtn",
                     EventData.of(Constants.KEY_ACTION, "leave-depot:" + selectedOwnerUUID), false);
             childIdx++;
@@ -153,7 +154,7 @@ public class AttunementSectionUI {
                 cmd.appendInline("#AttunementPanel", "Group { Anchor: (Height: 8); }");
                 cmd.appendInline("#AttunementPanel", "Group { Anchor: (Height: 1); Background: (Color: #2b3542); }");
                 cmd.appendInline("#AttunementPanel", "Group { Anchor: (Height: 6); }");
-                cmd.appendInline("#AttunementPanel", "Label { Text: \"MANAGE ACCESS\"; Style: (FontSize: 11, TextColor: #96a9be, RenderUppercase: true, RenderBold: true, HorizontalAlignment: Center); Anchor: (Height: 18); }");
+                cmd.appendInline("#AttunementPanel", "Label { Text: \"" + TranslationUtils.get("ui.attunement.manageAccess") + "\"; Style: (FontSize: 11, TextColor: #96a9be, RenderUppercase: true, RenderBold: true, HorizontalAlignment: Center); Anchor: (Height: 18); }");
                 childIdx += 4;
 
                 for (AttunedEntry attunedPlayerUUID : playersAttunedToMe) {

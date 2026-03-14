@@ -26,7 +26,7 @@ public class SetUpgradeStorageCostCommand extends AbstractAsyncCommand {
         List<Integer> newValues = context.get(values);
         int expected = Constants.MAX_UPGRADE_RANK - 1;
         if (newValues.size() != expected) {
-            context.sendMessage(Message.raw("Expected " + expected + " values, got " + newValues.size() + "."));
+            context.sendMessage(Message.raw(TranslationUtils.format("commands.wrongArgCount", expected, newValues.size())));
             return CompletableFuture.completedFuture(null);
         }
         for (int i = 0; i < newValues.size(); i++) {
@@ -34,7 +34,7 @@ public class SetUpgradeStorageCostCommand extends AbstractAsyncCommand {
         }
         TranslationUtils.refreshUpgradeDescriptions();
         Main.saveOperatorConfig();
-        context.sendMessage(Message.raw("Storage upgrade costs updated to: " + newValues));
+        context.sendMessage(Message.raw(TranslationUtils.format("commands.setUpgradeStorageCost.success", newValues)));
         return CompletableFuture.completedFuture(null);
     }
 }

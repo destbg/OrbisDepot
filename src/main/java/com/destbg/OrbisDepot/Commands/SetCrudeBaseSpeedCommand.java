@@ -2,6 +2,7 @@ package com.destbg.OrbisDepot.Commands;
 
 import com.destbg.OrbisDepot.Main;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
@@ -23,13 +24,13 @@ public class SetCrudeBaseSpeedCommand extends AbstractAsyncCommand {
     protected CompletableFuture<Void> executeAsync(@Nonnull CommandContext context) {
         int value = context.get(ms);
         if (value < Constants.UPLOAD_CLOCK_TICK_MS) {
-            context.sendMessage(Message.raw("Crude base speed cannot be lower than the tick speed (" + Constants.UPLOAD_CLOCK_TICK_MS + "ms)."));
+            context.sendMessage(Message.raw(TranslationUtils.format("commands.setCrudeBasespeed.tooLow", Constants.UPLOAD_CLOCK_TICK_MS)));
             return CompletableFuture.completedFuture(null);
         }
         Constants.UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS = value / 1000.0f;
         Constants.recomputeCrudeSigilTicks();
         Main.saveOperatorConfig();
-        context.sendMessage(Message.raw("Crude Orbis Sigil base upload speed set to " + value + "ms."));
+        context.sendMessage(Message.raw(TranslationUtils.format("commands.setCrudeBasespeed.success", value)));
         return CompletableFuture.completedFuture(null);
     }
 }

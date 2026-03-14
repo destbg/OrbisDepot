@@ -2,6 +2,7 @@ package com.destbg.OrbisDepot.Commands;
 
 import com.destbg.OrbisDepot.Main;
 import com.destbg.OrbisDepot.Utils.Constants;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
@@ -24,13 +25,13 @@ public class SetTickSpeedCommand extends AbstractAsyncCommand {
     protected CompletableFuture<Void> executeAsync(@Nonnull CommandContext context) {
         int value = context.get(ms);
         if (value < MIN_TICK_MS) {
-            context.sendMessage(Message.raw("Tick speed cannot be lower than " + MIN_TICK_MS + "ms."));
+            context.sendMessage(Message.raw(TranslationUtils.format("commands.setTickspeed.tooLow", MIN_TICK_MS)));
             return CompletableFuture.completedFuture(null);
         }
         Constants.UPLOAD_CLOCK_TICK_MS = value;
         Constants.recomputeCrudeSigilTicks();
         Main.saveOperatorConfig();
-        context.sendMessage(Message.raw("Tick speed set to " + value + "ms."));
+        context.sendMessage(Message.raw(TranslationUtils.format("commands.setTickspeed.success", value)));
         return CompletableFuture.completedFuture(null);
     }
 }

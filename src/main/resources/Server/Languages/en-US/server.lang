@@ -10,3 +10,59 @@ items.OrbisUpgradeStorage.name=Storage Upgrade %s
 items.OrbisUpgradeStorage.description=Upgrade capacity from %d to %d stacks per item. Cost: %d Voidhearts
 items.OrbisUpgradeSpeed.name=Speed Upgrade %s
 items.OrbisUpgradeSpeed.description=Upgrade deposit speed from %d to %d items/slot/min. Cost: %d Voidhearts
+
+messages.attunement.notBound=This attunement hasn't been bound yet.
+messages.attunement.corrupted=This attunement item is corrupted.
+messages.attunement.ownDepot=You can't attune to your own Depot.
+messages.attunement.alreadyAttuned=You are already attuned to %s's Depot.
+messages.attunement.success=You are now attuned to %s's Orbis Depot!
+messages.attunement.created=Attunement bound to you. Give it to another player so they can access your Depot.
+messages.depot.notAttuned=You are not attuned to this Orbis Depot.
+messages.crudeSigil.hasFullSigil=You cannot use the Crude Orbis Sigil while you have the fully restored version on you.
+
+commands.wrongArgCount=Expected %d values, got %d.
+commands.setUpgradeStacks.success=Storage upgrade stacks updated to: %s
+commands.setUpgradeStorageCost.success=Storage upgrade costs updated to: %s
+commands.setUpgradeSpeed.success=Speed upgrade divisors updated to: %s
+commands.setUpgradeSpeedCost.success=Speed upgrade costs updated to: %s
+commands.setBasespeed.tooLow=Base speed cannot be lower than the tick speed (%dms).
+commands.setBasespeed.success=Base upload speed set to %dms.
+commands.setTickspeed.tooLow=Tick speed cannot be lower than %dms.
+commands.setTickspeed.success=Tick speed set to %dms.
+commands.setCrudeBasespeed.tooLow=Crude base speed cannot be lower than the tick speed (%dms).
+commands.setCrudeBasespeed.success=Crude Orbis Sigil base upload speed set to %dms.
+
+ui.title.depot=Orbis Depot
+ui.title.sigil=Orbis Sigil
+ui.title.crudeSigil=Crude Orbis Sigil
+
+ui.attunement.thisPlayer=this player
+ui.attunement.leavePrompt=Leave depot of
+ui.attunement.removePrompt=Remove access for
+ui.attunement.confirmLeave=Yes, Leave
+ui.attunement.confirmRemove=Yes, Remove
+ui.attunement.cancel=Cancel
+ui.attunement.myDepot=My Depot
+ui.attunement.leaveButton=Leave %s's Depot
+ui.attunement.manageAccess=MANAGE ACCESS
+
+ui.settings.titleUpgrades=UPGRADES
+ui.settings.titleSettings=SETTINGS
+ui.settings.backToSettings=Back to Settings
+ui.settings.storageType=Storage
+ui.settings.speedType=Speed
+ui.settings.refundTitle=Refund %s Upgrade %s
+ui.settings.upgradeTitle=%s Upgrade %s
+ui.settings.upgradeStorageDesc=Upgrade capacity from %d to %d stacks per item
+ui.settings.downgradeStorageDesc=Downgrade capacity from %d to %d stacks per item
+ui.settings.upgradeSpeedDesc=Upgrade deposit speed from %d to %d items/slot/min
+ui.settings.downgradeSpeedDesc=Downgrade deposit speed from %d to %d items/slot/min
+ui.settings.costSingular=Cost: %d Voidheart
+ui.settings.costPlural=Cost: %d Voidhearts
+ui.settings.refundSingular=Refund: %d Voidheart
+ui.settings.refundPlural=Refund: %d Voidhearts
+ui.settings.available=Available: %d
+
+ui.deposit.statusNonStackable=Can't deposit non-stackable items
+ui.deposit.statusEmpty=Place items
+ui.deposit.statusDepositing=Depositing %d items/slot/min

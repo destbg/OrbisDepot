@@ -19,6 +19,15 @@ public final class TranslationUtils {
     private static final String SPEED_NAME_TEMPLATE_KEY = "server.items.OrbisUpgradeSpeed.name";
     private static final String SPEED_DESC_TEMPLATE_KEY = "server.items.OrbisUpgradeSpeed.description";
 
+    public static String get(String key) {
+        String msg = I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, "server." + key);
+        return msg != null ? msg : key;
+    }
+
+    public static String format(String key, Object... args) {
+        return String.format(get(key), args);
+    }
+
     public static void refreshUpgradeDescriptions() {
         I18nModule i18n = I18nModule.get();
         String storageNameTpl = i18n.getMessage(I18nModule.DEFAULT_LANGUAGE, STORAGE_NAME_TEMPLATE_KEY);

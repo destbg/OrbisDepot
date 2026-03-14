@@ -4,6 +4,7 @@ import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
 import com.destbg.OrbisDepot.Utils.InventoryUtils;
+import com.destbg.OrbisDepot.Utils.TranslationUtils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -227,13 +228,13 @@ public class DepositSectionUI {
     private void applyProgressStatus(@NonNullDecl UICommandBuilder cmd, boolean hasItems) {
         String statusText;
         if (hasItems && hasNonStackableInSlots()) {
-            statusText = "Can't deposit non-stackable items";
+            statusText = TranslationUtils.get("ui.deposit.statusNonStackable");
         } else if (!hasItems) {
-            statusText = "Place items";
+            statusText = TranslationUtils.get("ui.deposit.statusEmpty");
         } else {
             float tickInterval = context.getTickIntervalSeconds();
             int itemsPerMin = (int) Math.round(60.0 / tickInterval);
-            statusText = "Depositing " + itemsPerMin + " items/slot/min";
+            statusText = TranslationUtils.format("ui.deposit.statusDepositing", itemsPerMin);
         }
         cmd.set("#DepositStatusLabel.Text", statusText);
     }

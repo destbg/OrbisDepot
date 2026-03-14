@@ -77,9 +77,9 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         uiCommandBuilder.append("Pages/OrbisDepotStorage.ui");
 
         String title = switch (context) {
-            case OrbisDepotStorageModel _ -> "Orbis Depot";
-            case OrbisSigilStorageModel _ -> "Orbis Sigil";
-            case CrudeOrbisSigilStorageModel _ -> "Crude Orbis Sigil";
+            case OrbisDepotStorageModel _ -> TranslationUtils.get("ui.title.depot");
+            case OrbisSigilStorageModel _ -> TranslationUtils.get("ui.title.sigil");
+            case CrudeOrbisSigilStorageModel _ -> TranslationUtils.get("ui.title.crudeSigil");
             default -> throw new IllegalStateException("Unexpected value: " + context);
         };
         uiCommandBuilder.set("#TitleText.Text", title);

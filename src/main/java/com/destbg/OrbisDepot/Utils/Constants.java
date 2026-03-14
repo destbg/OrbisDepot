@@ -15,11 +15,7 @@ public final class Constants {
 
     public static final String KEY_ACTION = "Action";
     public static final String KEY_SEARCH_QUERY = "@SearchQuery";
-    public static final String KEY_SLOT_INDEX = "SlotIndex";
     public static final String KEY_CHECKBOX = "Checkbox";
-
-    public static final String CHECKBOX_AUTO_PLACE = "AutoPlace";
-    public static final String CHECKBOX_CRAFTING = "Crafting";
 
     public static float UPLOAD_INTERVAL_SIGIL_AND_DEPOT_SECONDS = 2.0f;
     public static float UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS = 4.0f;
@@ -29,9 +25,6 @@ public final class Constants {
     public static long CRUDE_SIGIL_TICKS_PER_UPLOAD =
             Math.round(UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS * 1000.0 / UPLOAD_CLOCK_TICK_MS);
 
-    public static void recomputeCrudeSigilTicks() {
-        CRUDE_SIGIL_TICKS_PER_UPLOAD = Math.round(UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS * 1000.0 / UPLOAD_CLOCK_TICK_MS);
-    }
     public static final short DEPOT_SLOT_CAPACITY = 1;
     public static final short SIGIL_UPLOAD_SLOT_CAPACITY = 4;
     public static final short CRUDE_SIGIL_UPLOAD_SLOT_CAPACITY = 2;
@@ -64,4 +57,8 @@ public final class Constants {
     public static final String SIGIL_ANIM_SET = "OrbisSpellbook";
     public static final String SIGIL_OPEN_ANIM = "CastSigilOpen";
     public static final String SIGIL_CLOSE_ANIM = "CastSigilClose";
+
+    public static void recomputeCrudeSigilTicks() {
+        CRUDE_SIGIL_TICKS_PER_UPLOAD = Math.round(UPLOAD_INTERVAL_CRUDE_SIGIL_SECONDS * 1000.0 / UPLOAD_CLOCK_TICK_MS);
+    }
 }
