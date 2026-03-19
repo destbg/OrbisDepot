@@ -4,7 +4,6 @@ import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Components.SigilPlayerData;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
