@@ -82,7 +82,7 @@ public class SigilPlayerData implements Component<EntityStore> {
         this.autoRestore = autoRestore;
     }
 
-    public boolean setCraftingIntegration() {
+    public boolean getCraftingIntegration() {
         return craftingIntegration;
     }
 
