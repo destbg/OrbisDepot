@@ -127,7 +127,37 @@ public class DepotStorageData {
     }
 
     public Map<String, Integer> getItemContainer() {
-        return itemContainer;
+        lock.readLock().lock();
+        try {
+            return new HashMap<>(itemContainer);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public int tryRemoveItems(@Nonnull String itemId, int requested) {
+        if (requested <= 0) {
+            return 0;
+        }
+        int removed;
+        lock.writeLock().lock();
+        try {
+            int current = itemContainer.getOrDefault(itemId, 0);
+            removed = Math.min(requested, current);
+            if (removed <= 0) {
+                return 0;
+            }
+            int newCount = current - removed;
+            if (newCount == 0) {
+                itemContainer.remove(itemId);
+            } else {
+                itemContainer.put(itemId, newCount);
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+        save();
+        return removed;
     }
 
     public Map<String, String> getAttunedToOthersRaw() {
