@@ -81,7 +81,7 @@ public class OrbisSigilStorageModel implements OrbisDepotStorageContext {
 
     @Override
     public boolean isCraftingIntegrationEnabled() {
-        return sigilPlayerData.setCraftingIntegration();
+        return sigilPlayerData.getCraftingIntegration();
     }
 
     @Override

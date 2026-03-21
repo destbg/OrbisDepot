@@ -47,7 +47,7 @@ public final class CraftingUtils {
             UUID uuid = playerRef.getUuid();
 
             SigilPlayerData sigilData = store.getComponent(ref, SigilPlayerData.getComponentType());
-            if (sigilData == null || !sigilData.setCraftingIntegration()) {
+            if (sigilData == null || !sigilData.getCraftingIntegration()) {
                 return;
             }
 
@@ -95,7 +95,7 @@ public final class CraftingUtils {
                 UUID uuid = playerRef.getUuid();
 
                 SigilPlayerData sigilData = store.getComponent(ref, SigilPlayerData.getComponentType());
-                if (sigilData == null || !sigilData.setCraftingIntegration()) {
+                if (sigilData == null || !sigilData.getCraftingIntegration()) {
                     return;
                 }
 
@@ -158,7 +158,7 @@ public final class CraftingUtils {
         CompletableFuture.runAsync(() -> {
             try {
                 SigilPlayerData sigilData = playerStore.getComponent(playerEntity, SigilPlayerData.getComponentType());
-                if (sigilData == null || !sigilData.setCraftingIntegration()) {
+                if (sigilData == null || !sigilData.getCraftingIntegration()) {
                     return;
                 }
 
