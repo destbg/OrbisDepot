@@ -135,57 +135,37 @@ public class DepositSectionUI {
 
         ItemContainer depositSlots = context.getUploadSlotContainer();
         int depositSlotCount = context.getDepositSlotCount();
+        int maxPerSlot = DepositUtils.getMaxStack(clickedStack.getItem(), 1, (short) 0);
+        int remaining = clickedStack.getQuantity();
 
-        short targetSlot = -1;
-        for (short s = 0; s < Math.min(depositSlotCount, depositSlots.getCapacity()); s++) {
+        for (short s = 0; s < Math.min(depositSlotCount, depositSlots.getCapacity()) && remaining > 0; s++) {
             ItemStack existing = depositSlots.getItemStack(s);
-            if (existing != null && !ItemStack.isEmpty(existing) && existing.getItemId().equals(clickedStack.getItemId())) {
-                targetSlot = s;
-                break;
+            if (existing == null || ItemStack.isEmpty(existing) || !existing.getItemId().equals(clickedStack.getItemId())) {
+                continue;
             }
-        }
-        if (targetSlot < 0) {
-            for (short s = 0; s < Math.min(depositSlotCount, depositSlots.getCapacity()); s++) {
-                ItemStack existing = depositSlots.getItemStack(s);
-                if (existing == null || ItemStack.isEmpty(existing)) {
-                    targetSlot = s;
-                    break;
-                }
+            int space = maxPerSlot - existing.getQuantity();
+            if (space <= 0) {
+                continue;
             }
+            int toDeposit = Math.min(remaining, space);
+            depositSlots.setItemStackForSlot(s, existing.withQuantity(existing.getQuantity() + toDeposit));
+            remaining -= toDeposit;
         }
 
-        if (targetSlot < 0) {
-            targetSlot = 0;
-        }
-
-        ItemStack existingInSlot = depositSlots.getItemStack(targetSlot);
-
-        if (existingInSlot != null && !ItemStack.isEmpty(existingInSlot)) {
-            if (!existingInSlot.getItemId().equals(clickedStack.getItemId())) {
-                InventoryUtils.giveToPlayer(playerInv, existingInSlot, existingInSlot.getQuantity(), context.getAdditionalStacks());
-                depositSlots.removeItemStackFromSlot(targetSlot);
-                existingInSlot = null;
+        for (short s = 0; s < Math.min(depositSlotCount, depositSlots.getCapacity()) && remaining > 0; s++) {
+            ItemStack existing = depositSlots.getItemStack(s);
+            if (existing != null && !ItemStack.isEmpty(existing)) {
+                continue;
             }
+            int toDeposit = Math.min(remaining, maxPerSlot);
+            depositSlots.setItemStackForSlot(s, new ItemStack(clickedStack.getItemId(), toDeposit));
+            remaining -= toDeposit;
         }
 
-        int maxStack = DepositUtils.getMaxStack(clickedStack.getItem(), 1, context.getAdditionalStacks());
-        int currentInSlot = (existingInSlot != null && !ItemStack.isEmpty(existingInSlot))
-                ? existingInSlot.getQuantity()
-                : 0;
-        int spaceInSlot = maxStack - currentInSlot;
-        int toDeposit = Math.min(clickedStack.getQuantity(), spaceInSlot);
-
-        if (toDeposit <= 0) {
+        if (remaining >= clickedStack.getQuantity()) {
             return;
         }
 
-        if (currentInSlot > 0) {
-            depositSlots.setItemStackForSlot(targetSlot, existingInSlot.withQuantity(currentInSlot + toDeposit));
-        } else {
-            depositSlots.setItemStackForSlot(targetSlot, new ItemStack(clickedStack.getItemId(), toDeposit));
-        }
-
-        int remaining = clickedStack.getQuantity() - toDeposit;
         if (remaining <= 0) {
             playerInv.removeItemStackFromSlot((short) slotIndex);
         } else {
@@ -215,7 +195,7 @@ public class DepositSectionUI {
             return;
         }
 
-        int given = InventoryUtils.giveToPlayer(playerInv, stack, stack.getQuantity(), context.getAdditionalStacks());
+        int given = InventoryUtils.giveToPlayer(playerInv, stack, stack.getQuantity(), (short) 0);
         if (given > 0) {
             int remaining = stack.getQuantity() - given;
             if (remaining <= 0) {
