@@ -122,16 +122,16 @@ public class StorageSectionUI {
     public void handleWithdraw(@NonNullDecl Ref<EntityStore> ref, @NonNullDecl Store<EntityStore> store, String itemId, boolean singleItem) {
         ItemContainer playerInv = InventoryComponent.getCombined(store, ref, InventoryComponent.HOTBAR_FIRST);
 
-        long available = depotStorage.getItemCount(itemId);
-        if (available <= 0) {
+        int maxStack = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), context.getAdditionalStacks());
+        int requested = singleItem ? 1 : maxStack;
+        int removed = depotStorage.tryRemoveItems(itemId, requested);
+        if (removed <= 0) {
             return;
         }
 
-        int maxStack = DepositUtils.getMaxStack(itemId, depotStorage.getStorageUpgradeRank(), context.getAdditionalStacks());
-        int requestedAmount = singleItem ? 1 : (int) Math.min(maxStack, available);
-        int given = InventoryUtils.giveToPlayer(playerInv, itemId, requestedAmount, context.getAdditionalStacks());
-        if (given > 0) {
-            depotStorage.removeItems(itemId, given);
+        int given = InventoryUtils.giveToPlayer(playerInv, itemId, removed, context.getAdditionalStacks());
+        if (given < removed) {
+            depotStorage.addItem(itemId, removed - given);
         }
     }
 }
