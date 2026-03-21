@@ -1,5 +1,6 @@
 package com.destbg.OrbisDepot.UI;
 
+import com.destbg.OrbisDepot.Components.DepotStorageData;
 import com.destbg.OrbisDepot.Models.OrbisDepotStorageContext;
 import com.destbg.OrbisDepot.Utils.Constants;
 import com.destbg.OrbisDepot.Utils.DepositUtils;
@@ -168,7 +169,9 @@ public class DepositSectionUI {
         }
 
         int maxStack = DepositUtils.getMaxStack(clickedStack.getItem(), 1, context.getAdditionalStacks());
-        int currentInSlot = (existingInSlot != null && !ItemStack.isEmpty(existingInSlot)) ? existingInSlot.getQuantity() : 0;
+        int currentInSlot = (existingInSlot != null && !ItemStack.isEmpty(existingInSlot))
+                ? existingInSlot.getQuantity()
+                : 0;
         int spaceInSlot = maxStack - currentInSlot;
         int toDeposit = Math.min(clickedStack.getQuantity(), spaceInSlot);
 
@@ -227,26 +230,51 @@ public class DepositSectionUI {
 
     private void applyProgressStatus(@NonNullDecl UICommandBuilder cmd, boolean hasItems) {
         String statusText;
-        if (hasItems && hasNonStackableInSlots()) {
-            statusText = TranslationUtils.get("ui.deposit.statusNonStackable");
-        } else if (!hasItems) {
+        if (!hasItems) {
             statusText = TranslationUtils.get("ui.deposit.statusEmpty");
-        } else {
+        } else if (canDepositAny()) {
             float tickInterval = context.getTickIntervalSeconds();
             int itemsPerMin = (int) Math.round(60.0 / tickInterval);
             statusText = TranslationUtils.format("ui.deposit.statusDepositing", itemsPerMin);
+        } else if (hasOnlyNonStackable()) {
+            statusText = TranslationUtils.get("ui.deposit.statusNonStackable");
+        } else {
+            statusText = TranslationUtils.get("ui.deposit.statusStorageFull");
         }
         cmd.set("#DepositStatusLabel.Text", statusText);
     }
 
-    private boolean hasNonStackableInSlots() {
+    public boolean hasDepositableItems() {
+        return canDepositAny();
+    }
+
+    private boolean canDepositAny() {
+        DepotStorageData storage = context.getDepotStorageData();
+        int rank = storage.getStorageUpgradeRank();
+        short additionalStacks = context.getAdditionalStacks();
         ItemContainer depositSlots = context.getUploadSlotContainer();
         for (short i = 0; i < depositSlots.getCapacity(); i++) {
             ItemStack stack = depositSlots.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack) && DepositUtils.isDepositEligible(stack)) {
+            if (stack == null || ItemStack.isEmpty(stack) || DepositUtils.isDepositEligible(stack)) {
+                continue;
+            }
+
+            int max = DepositUtils.getMaxStack(stack.getItem(), rank, additionalStacks);
+            if (storage.getItemCount(stack.getItemId()) < max) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean hasOnlyNonStackable() {
+        ItemContainer depositSlots = context.getUploadSlotContainer();
+        for (short i = 0; i < depositSlots.getCapacity(); i++) {
+            ItemStack stack = depositSlots.getItemStack(i);
+            if (stack != null && !ItemStack.isEmpty(stack) && !DepositUtils.isDepositEligible(stack)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
