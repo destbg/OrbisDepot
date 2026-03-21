@@ -13,7 +13,6 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.entity.AnimationUtils;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -113,7 +112,7 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         if (context.getTickIntervalSeconds() <= 0.5f) {
             uiCommandBuilder.remove("#UploadProgressBar");
             uiCommandBuilder.remove("#UploadProgressBarSpacer");
-        } else if (hasDepositItems()) {
+        } else if (depositSection.hasDepositableItems()) {
             uiCommandBuilder.set("#UploadProgressBar.Value", context.getUploadProgress());
         } else {
             uiCommandBuilder.set("#UploadProgressBar.Value", 0.0f);
@@ -132,30 +131,19 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
         boolean hasChanges = storageSection.buildTick(cmd, evt);
         hasChanges |= depositSection.buildTick(cmd, evt);
         if (context.getTickIntervalSeconds() > 0.5f) {
-            boolean hasItems = hasDepositItems();
-            if (hasItems) {
+            boolean hasDepositable = depositSection.hasDepositableItems();
+            if (hasDepositable) {
                 cmd.set("#UploadProgressBar.Value", context.getUploadProgress());
                 hasChanges = true;
             } else if (lastHadDepositItems) {
                 cmd.set("#UploadProgressBar.Value", 0.0f);
                 hasChanges = true;
             }
-            lastHadDepositItems = hasItems;
+            lastHadDepositItems = hasDepositable;
         }
         if (hasChanges) {
             sendUpdate(cmd, evt, false);
         }
-    }
-
-    private boolean hasDepositItems() {
-        ItemContainer slots = context.getUploadSlotContainer();
-        for (short i = 0; i < slots.getCapacity(); i++) {
-            ItemStack stack = slots.getItemStack(i);
-            if (stack != null && !ItemStack.isEmpty(stack)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void syncSelectedStorage() {

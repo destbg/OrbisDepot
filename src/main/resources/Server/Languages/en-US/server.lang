@@ -66,3 +66,4 @@ ui.settings.available=Available: %d
 ui.deposit.statusNonStackable=Can't deposit non-stackable items
 ui.deposit.statusEmpty=Place items
 ui.deposit.statusDepositing=Depositing %d items/slot/min
+ui.deposit.statusStorageFull=Storage full
