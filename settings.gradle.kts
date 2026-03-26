@@ -9,7 +9,7 @@ plugins {
 // Create a folder named "common", then configure details with `common { }`
 
 hytale {
-    usePatchline("pre-release")
+    usePatchline("release")
     useVersion("latest")
 
     repositories {
