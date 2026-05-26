@@ -15,7 +15,7 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3i;
+import org.joml.Vector3i;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
@@ -94,7 +94,7 @@ public class OrbisDepotOpenInteraction extends SimpleInstantInteraction {
         DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(playerRef.getUuid());
         boolean isAttuned = myStorage.isAttunedTo(ownerUUID);
         if (!isOwner && !isAttuned) {
-            player.sendMessage(Message.raw(TranslationUtils.get("messages.depot.notAttuned")).color("#ff6b6b"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.depot.notAttuned")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }

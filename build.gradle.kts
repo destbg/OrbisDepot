@@ -9,3 +9,7 @@ repositories {
 dependencies {
     // Any external dependency you also want to include
 }
+
+configurations.all {
+    resolutionStrategy.force("com.hypixel.hytale:Server:0.5.0")
+}

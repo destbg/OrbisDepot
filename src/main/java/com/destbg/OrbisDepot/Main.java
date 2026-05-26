@@ -118,12 +118,7 @@ public class Main extends JavaPlugin {
                         return;
                     }
 
-                    Player player = ref.getStore().getComponent(ref, Player.getComponentType());
-                    if (player == null) {
-                        return;
-                    }
-
-                    player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.created")).color("#7bed9f"));
+                    playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.created")).color("#7bed9f"));
                 });
             };
 

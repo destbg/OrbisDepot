@@ -80,7 +80,7 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         String crafterName = heldItem.getFromMetadataOrNull(Constants.META_CRAFTER_NAME, Codec.STRING);
 
         if (crafterUuidStr == null) {
-            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.notBound")).color("#ffa502"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.notBound")).color("#ffa502"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -89,13 +89,13 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         try {
             crafterUUID = UUID.fromString(crafterUuidStr);
         } catch (IllegalArgumentException e) {
-            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.corrupted")).color("#ff6b6b"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.corrupted")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
 
         if (crafterUUID.equals(myUUID)) {
-            player.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.ownDepot")).color("#ff6b6b"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.attunement.ownDepot")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -105,7 +105,7 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
         DepotStorageData myStorage = DepotStorageManager.get().getOrCreate(myUUID);
 
         if (myStorage.isAttunedTo(crafterUUID)) {
-            player.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.alreadyAttuned", displayName)).color("#ffa502"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.alreadyAttuned", displayName)).color("#ffa502"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }
@@ -120,6 +120,6 @@ public class OrbisDepotAttunementConsumeInteraction extends SimpleInstantInterac
             hotbar.setItemStackForSlot(activeSlot, heldItem.withQuantity(newQty));
         }
 
-        player.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.success", displayName)).color("#2ed573"));
+        playerRef.sendMessage(Message.raw(TranslationUtils.format("messages.attunement.success", displayName)).color("#2ed573"));
     }
 }

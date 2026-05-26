@@ -6,7 +6,7 @@ import com.destbg.OrbisDepot.Utils.*;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3i;
+import org.joml.Vector3i;
 import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -280,8 +280,8 @@ public class OrbisDepotStorageUI extends InteractiveCustomUIPage<StorageModel> {
                 Vector3i location = depot.getLocation();
                 World world = depot.getWorld();
 
-                BlockStateUtils.setBlockInteractionState("CloseWindow", world, location.getX(), location.getY(), location.getZ());
-                SoundUtils.playSFX("SFX_Chest_Wooden_Close", location.getX(), location.getY(), location.getZ(), world.getEntityStore().getStore());
+                BlockStateUtils.setBlockInteractionState("CloseWindow", world, location.x, location.y, location.z);
+                SoundUtils.playSFX("SFX_Chest_Wooden_Close", location.x, location.y, location.z, world.getEntityStore().getStore());
             } catch (Throwable t) {
                 LOGGER.at(Level.WARNING).withCause(t).log("Failed to play chest close sound");
             }

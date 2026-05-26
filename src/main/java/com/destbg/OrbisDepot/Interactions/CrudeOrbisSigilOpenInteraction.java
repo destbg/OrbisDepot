@@ -68,7 +68,7 @@ public class CrudeOrbisSigilOpenInteraction extends SimpleInstantInteraction {
         }
 
         if (InventoryUtils.hasOrbisSigil(store, ref)) {
-            player.sendMessage(Message.raw(TranslationUtils.get("messages.crudeSigil.hasFullSigil")).color("#ff6b6b"));
+            playerRef.sendMessage(Message.raw(TranslationUtils.get("messages.crudeSigil.hasFullSigil")).color("#ff6b6b"));
             interactionContext.getState().state = InteractionState.Failed;
             return;
         }

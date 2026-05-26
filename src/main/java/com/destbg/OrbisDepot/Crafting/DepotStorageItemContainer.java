@@ -26,14 +26,20 @@ public final class DepotStorageItemContainer extends SimpleItemContainer {
 
         this.lock.writeLock().lock();
         try {
-            this.items.clear();
+            int count = 0;
+            for (Integer qty : items.values()) {
+                if (qty > 0) {
+                    count++;
+                }
+            }
+            this.items = new ItemStack[count];
             short slot = 0;
             for (Map.Entry<String, Integer> entry : items.entrySet()) {
                 int qty = entry.getValue();
                 if (qty <= 0) {
                     continue;
                 }
-                this.items.put(slot, new ItemStack(entry.getKey(), qty));
+                this.items[slot] = new ItemStack(entry.getKey(), qty);
                 slot++;
             }
             this.capacity = slot;

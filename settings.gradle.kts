@@ -1,4 +1,12 @@
+import java.util.Properties
+
 rootProject.name = "com.destbg.OrbisDepot"
+
+val localProps = file("local.properties")
+if (localProps.exists()) {
+    Properties().apply { localProps.inputStream().use { load(it) } }
+        .forEach { (k, v) -> settings.extra[k.toString()] = v.toString() }
+}
 
 plugins {
     // See documentation on https://scaffoldit.dev

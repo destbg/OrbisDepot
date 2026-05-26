@@ -3,7 +3,7 @@ package com.destbg.OrbisDepot.Utils;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
@@ -34,7 +34,7 @@ public final class SoundUtils {
             }
 
             Vector3d pos = transform.getPosition();
-            SoundUtil.playSoundEvent3dToPlayer(playerRef, index, SoundCategory.SFX, pos, store);
+            SoundUtil.playSoundEvent3dToPlayer(playerRef, index, SoundCategory.SFX, pos.x, pos.y, pos.z, store);
         } catch (Throwable t) {
             LOGGER.at(Level.WARNING).withCause(t).log("Error playing sound to player: " + sound);
         }
