@@ -1,79 +1,79 @@
 {
-  "TranslationProperties": {
-    "Name": "server.items.Orbis_Depot_Attunement.name",
-    "Description": "server.items.Orbis_Depot_Attunement.description"
-  },
-  "Icon": "Icons/ItemsGenerated/Orbis_Depot_Attunement.png",
-  "Quality": "Uncommon",
-  "MaxStack": 1,
-  "ItemLevel": 30,
-  "Categories": [
-    "Items.Orbis_Depot"
-  ],
-  "Recipe": {
-    "TimeSeconds": 2,
-    "Input": [
-      {
-        "ItemId": "Ingredient_Void_Essence",
-        "Quantity": 4
-      },
-      {
-        "ItemId": "Ingredient_Bar_Gold",
-        "Quantity": 2
-      }
-    ],
-    "BenchRequirement": [
-      {
-        "Id": "Workbench",
-        "Type": "Crafting",
-        "Categories": [
-          "Workbench_Tinkering"
-        ]
-      }
-    ]
-  },
-  "PlayerAnimationsId": "Item",
-  "Model": "Items/Consumables/Recipes/Recipe.blockymodel",
-  "Texture": "Items/Custom/Orbis_Depot_Attunement.png",
-  "IconProperties": {
-    "Scale": 1,
-    "Rotation": [
-      33.92,
-      68.795,
-      40.67
-    ],
-    "Translation": [
-      -0.895,
-      -7
-    ]
-  },
-  "Consumable": true,
-  "Interactions": {
-    "Primary": {
-      "Interactions": [
-        {
-          "Type": "CheckUniqueItemUsage",
-          "Next": {
-            "Type": "IncreaseBackpackCapacity",
-            "Capacity": 9
-          }
-        }
-      ]
+    "TranslationProperties": {
+        "Name": "server.items.Orbis_Depot_Attunement.name",
+        "Description": "server.items.Orbis_Depot_Attunement.description"
     },
-    "Secondary": {
-      "Interactions": [
-        {
-          "Type": "Orbis_Depot_Attune"
-        }
-      ]
-    }
-  },
-  "Tags": {
-    "Family": [
-      "Backpack"
+    "Icon": "Icons/ItemsGenerated/Orbis_Depot_Attunement.png",
+    "Quality": "Uncommon",
+    "MaxStack": 1,
+    "ItemLevel": 30,
+    "Categories": [
+        "Items.Orbis_Depot"
     ],
-    "Type": [
-      "Upgrade"
-    ]
-  }
+    "Recipe": {
+        "TimeSeconds": 2,
+        "Input": [
+            {
+                "ItemId": "Ingredient_Void_Essence",
+                "Quantity": 4
+            },
+            {
+                "ItemId": "Ingredient_Bar_Gold",
+                "Quantity": 2
+            }
+        ],
+        "BenchRequirement": [
+            {
+                "Id": "Workbench",
+                "Type": "Crafting",
+                "Categories": [
+                    "Workbench_Tinkering"
+                ]
+            }
+        ]
+    },
+    "PlayerAnimationsId": "Item",
+    "Model": "Items/Consumables/Recipes/Recipe.blockymodel",
+    "Texture": "Items/Custom/Orbis_Depot_Attunement.png",
+    "IconProperties": {
+        "Scale": 1,
+        "Rotation": [
+            33.92,
+            68.795,
+            40.67
+        ],
+        "Translation": [
+            -0.895,
+            -7
+        ]
+    },
+    "Consumable": true,
+    "Interactions": {
+        "Primary": {
+            "Interactions": [
+                {
+                    "Type": "CheckUniqueItemUsage",
+                    "Next": {
+                        "Type": "IncreaseBackpackCapacity",
+                        "Capacity": 9
+                    }
+                }
+            ]
+        },
+        "Secondary": {
+            "Interactions": [
+                {
+                    "Type": "Orbis_Depot_Attune"
+                }
+            ]
+        }
+    },
+    "Tags": {
+        "Family": [
+            "Backpack"
+        ],
+        "Type": [
+            "Upgrade"
+        ]
+    }
 }

@@ -11,5 +11,5 @@ dependencies {
 }
 
 configurations.all {
-    resolutionStrategy.force("com.hypixel.hytale:Server:0.5.0")
+    resolutionStrategy.force("com.hypixel.hytale:Server:0.6.1")
 }

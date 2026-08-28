@@ -7,9 +7,6 @@
   "Categories": [
     "Furniture.Containers"
   ],
-  "Model": "Blocks/Dungeons/Chest_Epic_Small.blockymodel",
-  "Texture": "Blocks/Custom/Chest_Orbis_Depot.png",
-  "Scale": 0.6,
   "Icon": "Icons/ItemsGenerated/Orbis_Depot.png",
   "Recipe": {
     "BenchRequirement": [

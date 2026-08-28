@@ -1,87 +1,85 @@
 {
-  "TranslationProperties": {
-    "Name": "server.items.Orbis_Sigil.name",
-    "Description": "server.items.Orbis_Sigil.description"
-  },
-  "Categories": [
-    "Items.Orbis_Depot"
-  ],
-  "Quality": "Legendary",
-  "ItemLevel": 40,
-  "Model": "Blocks/Custom/Book_Orbis_Sigil.blockymodel",
-  "Texture": "Blocks/Custom/Book_Orbis_Sigil.png",
-  "PlayerAnimationsId": "Spellbook",
-  "IconProperties": {
-    "Scale": 0.6,
-    "Rotation": [
-      45,
-      90,
-      0
+    "TranslationProperties": {
+        "Name": "server.items.Orbis_Sigil.name",
+        "Description": "server.items.Orbis_Sigil.description"
+    },
+    "Categories": [
+        "Items.Orbis_Depot"
     ],
-    "Translation": [
-      -10,
-      -10
-    ]
-  },
-  "Icon": "Icons/ItemsGenerated/Orbis_Sigil.png",
-  "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
-  "MaxStack": 1,
-  "Tags": {
-    "Family": [
-      "Spellbook"
-    ]
-  },
-  "ItemSoundSetId": "ISS_Weapons_Books",
-  "Interactions": {
-    "Secondary": {
-      "Interactions": [
-        {
-          "Type": "Orbis_Sigil_Open"
-        }
-      ],
-      "Settings": {
-        "Adventure": {},
-        "Creative": {}
-      }
-    }
-  },
-  "BlockType": {
-    "BlockParticleSetId": "Metal",
-    "BlockSoundSetId": "Metal",
-    "CustomModel": "Blocks/Custom/Book_Orbis_Sigil.blockymodel",
-    "CustomModelTexture": [
-      {
-        "Texture": "Blocks/Custom/Book_Orbis_Sigil.png",
-        "Weight": 1
-      }
-    ],
-    "DrawType": "Model"
-  },
-  "Recipe": {
-    "BenchRequirement": [
-      {
-        "Type": "Crafting",
-        "Id": "Arcanebench",
-        "Categories": [
-          "Arcane_Misc"
+    "Quality": "Legendary",
+    "ItemLevel": 40,
+    "PlayerAnimationsId": "Spellbook",
+    "IconProperties": {
+        "Scale": 0.6,
+        "Rotation": [
+            45,
+            90,
+            0
+        ],
+        "Translation": [
+            -10,
+            -10
         ]
-      }
-    ],
-    "TimeSeconds": 5,
-    "Input": [
-      {
-        "ItemId": "Ingredient_Voidheart",
-        "Quantity": 1
-      },
-      {
-        "ItemId": "Ingredient_Bar_Thorium",
-        "Quantity": 10
-      },
-      {
-        "ItemId": "Crude_Orbis_Sigil",
-        "Quantity": 1
-      }
-    ],
-    "OutputQuantity": 1
-  }
+    },
+    "Icon": "Icons/ItemsGenerated/Orbis_Sigil.png",
+    "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
+    "MaxStack": 1,
+    "Tags": {
+        "Family": [
+            "Spellbook"
+        ]
+    },
+    "ItemSoundSetId": "ISS_Weapons_Books",
+    "Interactions": {
+        "Secondary": {
+            "Interactions": [
+                {
+                    "Type": "Orbis_Sigil_Open"
+                }
+            ],
+            "Settings": {
+                "Adventure": {},
+                "Creative": {}
+            }
+        }
+    },
+    "BlockType": {
+        "BlockParticleSetId": "Metal",
+        "BlockSoundSetId": "Metal",
+        "CustomModel": "Blocks/Custom/Book_Orbis_Sigil.blockymodel",
+        "CustomModelTexture": [
+            {
+                "Texture": "Blocks/Custom/Book_Orbis_Sigil.png",
+                "Weight": 1
+            }
+        ],
+        "DrawType": "Model"
+    },
+    "Recipe": {
+        "BenchRequirement": [
+            {
+                "Type": "Crafting",
+                "Id": "Arcanebench",
+                "Categories": [
+                    "Arcane_Misc"
+                ]
+            }
+        ],
+        "TimeSeconds": 5,
+        "Input": [
+            {
+                "ItemId": "Ingredient_Voidheart",
+                "Quantity": 1
+            },
+            {
+                "ItemId": "Ingredient_Bar_Thorium",
+                "Quantity": 10
+            },
+            {
+                "ItemId": "Crude_Orbis_Sigil",
+                "Quantity": 1
+            }
+        ],
+        "OutputQuantity": 1
+    }
 }
